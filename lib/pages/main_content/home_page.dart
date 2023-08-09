@@ -10,12 +10,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<String> imgList = [
-    'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-    'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
+    'https://images.unsplash.com/photo-1691071716244-db306a482fc0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80',
+    'https://images.unsplash.com/photo-1691264122434-3b5a1dac81d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=928&q=80',
     'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
   ];
   final MaterialStateProperty<Color> searchBarColor = MaterialStateProperty.all(Colors.white);
 
@@ -33,18 +30,19 @@ class _HomePageState extends State<HomePage> {
         .toList();
 
     return Scaffold(
+      backgroundColor: Colors.white70,
       appBar: AppBar(
         elevation: 3,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('The Data Store',
+            const Text('The DataStore',
             style: TextStyle(
               color: Colors.white,
               fontSize: 27
             ),
             ),
-            SizedBox(width: screenWidth/90,),
+            SizedBox(width: screenWidth/100,),
             const Text('Portal',
             style: TextStyle(
               color: Color.fromRGBO(196, 102, 12, 1),
@@ -106,23 +104,64 @@ class _HomePageState extends State<HomePage> {
                 )),
                 elevation: MaterialStateProperty.all(3.0),
 
-                trailing: [Container(
-                  height: screenHeight/17,
-                  width: screenWidth/35,
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(196, 102, 12, 1),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Center(
+                trailing: [
+                  Center(
                     child: IconButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.search_rounded,
-                        color: Colors.white,
-                        size: 30,)),
-                  ),
-                )],
+                        icon: Icon(Icons.search_rounded,
+                          color: const Color.fromRGBO(196, 102, 12, 1),
+                          size: screenWidth/45,)),
+                  )
+                ],
               )
           ),
+          Positioned(
+            top: screenHeight / 1.58,
+            left: screenWidth / 2.6,
+            child: Container(
+              height: screenHeight / 5,
+              width: screenWidth / 4,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(0, 101, 168, 1),
+                borderRadius: BorderRadius.circular(60),
+                boxShadow: const [
+                  BoxShadow(
+                  color: Color.fromRGBO(196, 102, 12, 0.8),
+                    offset: Offset(0,3),
+                    blurRadius: 6,
+                  )
+                ]
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Upload Dataset',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: screenWidth/50,
+                      ),),
+                      SizedBox(width: screenWidth/50,),
+                      Icon(Icons.upload_file_outlined,
+                      color: const Color.fromRGBO(196, 102, 12, 1),
+                        size: screenWidth/30,
+                      )
+                    ],
+                  ),
+                  SizedBox(height: screenHeight/50,),
+                  Text('file types: .csv, .xsxl, .shp, .odt',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth/80,
+                    fontWeight: FontWeight.w500
+                  ),)
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
