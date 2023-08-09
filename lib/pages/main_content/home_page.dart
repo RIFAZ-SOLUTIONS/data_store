@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
         .toList();
 
     return Scaffold(
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.white60,
       appBar: AppBar(
         elevation: 3,
         title: Row(
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
               fontSize: 27
             ),
             ),
-            SizedBox(width: screenWidth/100,),
+            SizedBox(width: screenWidth/130,),
             const Text('Portal',
             style: TextStyle(
               color: Color.fromRGBO(196, 102, 12, 1),
@@ -74,36 +74,36 @@ class _HomePageState extends State<HomePage> {
           ),
           Positioned(
               top: screenHeight/15,
-              left: screenWidth/2.8,
-              child: const Text('Tanzania Accessible Data',
+              left: screenWidth/2.6,
+              child: Text('Tanzania Accessible Data',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 32,
+                fontSize: screenWidth/45,
                 fontWeight: FontWeight.w700,
               ),)
           ),
           Positioned(
               top: screenHeight/5,
-              left: screenWidth/2.8,
-              child: const Text('"We believe in the power of data custodianship."',
+              left: screenWidth/3,
+              child: Text('"We believe in the power of data custodianship."',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: screenWidth/60,
                 fontWeight: FontWeight.w700,
               ),)
           ),
           Positioned(
               top: screenHeight/3,
-              left: screenWidth/4.8,
+              left: screenWidth/4.4,
               child: SearchBar(
                 hintText: 'Search datasets',
                 backgroundColor: searchBarColor,
+                constraints: BoxConstraints(maxWidth: screenWidth/1.85),
                 side: MaterialStateProperty.all( const BorderSide(
                   style: BorderStyle.solid,
                   color: Color.fromRGBO(196, 102, 12, 1),
                 )),
                 elevation: MaterialStateProperty.all(3.0),
-
                 trailing: [
                   Center(
                     child: IconButton(
@@ -118,47 +118,50 @@ class _HomePageState extends State<HomePage> {
           Positioned(
             top: screenHeight / 1.58,
             left: screenWidth / 2.6,
-            child: Container(
-              height: screenHeight / 5,
-              width: screenWidth / 4,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(0, 101, 168, 1),
-                borderRadius: BorderRadius.circular(60),
-                boxShadow: const [
-                  BoxShadow(
-                  color: Color.fromRGBO(196, 102, 12, 0.8),
-                    offset: Offset(0,3),
-                    blurRadius: 6,
-                  )
-                ]
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Upload Dataset',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: screenWidth/50,
-                      ),),
-                      SizedBox(width: screenWidth/50,),
-                      Icon(Icons.upload_file_outlined,
-                      color: const Color.fromRGBO(196, 102, 12, 1),
-                        size: screenWidth/30,
-                      )
-                    ],
-                  ),
-                  SizedBox(height: screenHeight/50,),
-                  Text('file types: .csv, .xsxl, .shp, .odt',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: screenWidth/80,
-                    fontWeight: FontWeight.w500
-                  ),)
-                ],
+            child: InkWell(
+              onTap: () {},
+              child: Container(
+                height: screenHeight / 5,
+                width: screenWidth / 4,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(0, 101, 168, 1),
+                  borderRadius: BorderRadius.circular(60),
+                  boxShadow: const [
+                    BoxShadow(
+                    color: Color.fromRGBO(196, 102, 12, 0.8),
+                      offset: Offset(0,3),
+                      blurRadius: 6,
+                    )
+                  ]
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Upload Dataset',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: screenWidth/50,
+                        ),),
+                        SizedBox(width: screenWidth/50,),
+                        Icon(Icons.upload_file_outlined,
+                        color: const Color.fromRGBO(196, 102, 12, 1),
+                          size: screenWidth/30,
+                        )
+                      ],
+                    ),
+                    SizedBox(height: screenHeight/50,),
+                    Text('file types: .csv, .xsxl, .shp, .odt',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenWidth/80,
+                      fontWeight: FontWeight.w500
+                    ),)
+                  ],
+                ),
               ),
             ),
           )
