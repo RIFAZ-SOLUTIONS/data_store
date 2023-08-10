@@ -58,6 +58,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '251164515377',
     projectId: 'datastore-b1f0a',
     authDomain: 'datastore-b1f0a.firebaseapp.com',
+    databaseURL: 'https://datastore-b1f0a-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'datastore-b1f0a.appspot.com',
     measurementId: 'G-EC2BJFDZN6',
   );
