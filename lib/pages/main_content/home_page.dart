@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late bool isVisible;
   final ScrollController scrollController = ScrollController();
   final List<String> imgList = [
     'https://images.unsplash.com/photo-1691071716244-db306a482fc0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80',
@@ -20,6 +21,15 @@ class _HomePageState extends State<HomePage> {
   final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
   final TextEditingController searchController = TextEditingController();
   List<dynamic> suggestions = [];
+  late DatabaseEvent event;
+
+  Future<DatabaseEvent> fetchData() async{
+    final DatabaseReference ref = rtDatabase.ref('datasets');
+    final DatabaseEvent event = await ref
+        .orderByChild('title')
+        .once();
+    return event;
+  }
 
   Future<void> fetchSuggestions(String query) async {
     if (query.isEmpty) {
@@ -27,30 +37,48 @@ class _HomePageState extends State<HomePage> {
         suggestions = [];
       });
     }
-    final DatabaseReference ref = rtDatabase.ref('datasets');
-    // final DataSnapshot event = await ref.limitToFirst(2).get();
-    // ref.orderByChild('downloads').limitToFirst(2).onValue.listen((event) async{
-    //   final even = await event.snapshot.ref.get();
-    //   final data = event.snapshot.value;
-    //   print(even.children.length);
-    //   print(data);
-    // });
-
-    final DatabaseEvent event = await ref
-        .orderByChild('title')
-        .limitToFirst(5)
-        .once();
 
     final updatedSuggestions = [];
-    final Map<dynamic, dynamic> values = event.snapshot.value as Map;
+    late Map<dynamic, dynamic> values;
+    try {
+      values = event.snapshot.value as Map<dynamic, dynamic>;
+    } catch(e){
+      values = {'dataset0':
+        {
+        'title': 'No results',
+        'downloads': 0,
+        'added': ''
+        }
+      };
+    }
+
+    final RegExp regExp = RegExp(query, caseSensitive: false);
 
     values.forEach((key, value) {
-      updatedSuggestions.add(value);
+      if (regExp.hasMatch(value['title'])){
+        updatedSuggestions.add(value);
+      }
     });
 
     setState(() {
-      suggestions = updatedSuggestions;
+      if (updatedSuggestions.isEmpty){
+        suggestions = [
+          {
+            'title': 'No results',
+            'downloads': 0,
+            'added': ''
+          }
+        ];
+      } else {
+        suggestions = updatedSuggestions;
+      }
     });
+  }
+
+  @override
+  void initState() {
+    isVisible = false;
+    super.initState();
   }
 
   @override
@@ -163,8 +191,23 @@ class _HomePageState extends State<HomePage> {
                                   size: screenWidth/45,)),
                           ),
                         ],
+                        onTap: () async{
+                          final DatabaseEvent currentEvent = await fetchData();
+                          setState(() {
+                            event = currentEvent;
+                          });
+                        },
                         onChanged: (query) async{
-                          await fetchSuggestions(query);
+                          if(query.isEmpty){
+                            setState(() {
+                              isVisible = false;
+                            });
+                          } else {
+                            setState(() {
+                              isVisible = true;
+                            });
+                            await fetchSuggestions(query);
+                          }
                         },
                       )
                   ),
@@ -176,92 +219,135 @@ class _HomePageState extends State<HomePage> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: suggestions.length,
+              itemCount: suggestions.length > 6 ? 6 : suggestions.length,
               itemBuilder: (context, index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: screenWidth/1.6,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Color.fromRGBO(196, 102, 12, 0.7),
-                            style: BorderStyle.solid,
-                            width: 2,
+                return Visibility(
+                  visible: isVisible,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: screenWidth/1.6,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Color.fromRGBO(196, 102, 12, 0.7),
+                              style: BorderStyle.solid,
+                              width: 2,
+                            ),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(0,1),
+                              color: Color.fromRGBO(196, 102, 12, 0.7),
+                              blurRadius: 2,
+                              blurStyle: BlurStyle.outer,
+                            )
+                          ]
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0,1),
-                            color: Color.fromRGBO(196, 102, 12, 0.7),
-                            blurRadius: 2,
-                            blurStyle: BlurStyle.outer,
-                          )
-                        ]
+                        child: ListTile(
+                          title: Text(suggestions[index]['title'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),),
+                          subtitle: Row(
+                            children: [
+                              Text('Date added: ${suggestions[index]["added"]}'),
+                              SizedBox(width: screenWidth/120,),
+                              Text('Category: ${suggestions[index]["category"]}'),
+                              SizedBox(width: screenWidth/120,),
+                              Container(
+                                height: screenHeight/38,
+                                width: screenWidth/35,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(196, 102, 12, 0.7),
+                                  borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Center(
+                                  child: Text(suggestions[index]["filetype"].toString().toUpperCase(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: screenWidth/110,
+                                    fontWeight: FontWeight.bold,
+                                  ),),
+                                ),
+                              ),
+                              SizedBox(width: screenWidth/120,),
+                              const Icon(Icons.file_download_outlined,
+                              color: Color.fromRGBO(0, 101, 168, 1),),
+                              Text(suggestions[index]["downloads"].toString(),
+                              style: const TextStyle(
+                                color: Colors.deepPurpleAccent,
+                                fontWeight: FontWeight.bold
+                              ),),
+                            ],
+                          ),
+                          textColor: Colors.black,
+                          tileColor: Colors.white54,
+                        ),
                       ),
-                      child: ListTile(
-                        title: Text(suggestions[index]['title']),
-                        subtitle: Text(suggestions[index]["added"]),
-                        textColor: Colors.black,
-                        tileColor: Colors.white54,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
             SizedBox(height: screenHeight/10,),
-            InkWell(
-              onTap: () {},
-              child: Container(
-                height: screenHeight / 5,
-                width: screenWidth / 4,
-                decoration: BoxDecoration(
-                    color: const Color.fromRGBO(0, 101, 168, 1),
-                    borderRadius: BorderRadius.circular(60),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromRGBO(196, 102, 12, 0.8),
-                        offset: Offset(0,3),
-                        blurRadius: 6,
-                      )
-                    ]
-                ),
-                constraints: BoxConstraints(
-                  maxHeight: screenHeight / 5,
-                  maxWidth: screenWidth / 4,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {},
+                  child: Container(
+                    height: screenHeight / 5,
+                    width: screenWidth / 4,
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(0, 101, 168, 1),
+                        borderRadius: BorderRadius.circular(60),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color.fromRGBO(196, 102, 12, 0.8),
+                            offset: Offset(0,3),
+                            blurRadius: 6,
+                          )
+                        ]
+                    ),
+                    constraints: BoxConstraints(
+                      maxHeight: screenHeight / 5,
+                      maxWidth: screenWidth / 4,
+                    ),
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Upload Dataset',
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Upload Dataset',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: screenWidth/50,
+                              ),),
+                            SizedBox(width: screenWidth/50,),
+                            Icon(Icons.upload_file_outlined,
+                              color: const Color.fromRGBO(196, 102, 12, 1),
+                              size: screenWidth/30,
+                            )
+                          ],
+                        ),
+                        SizedBox(height: screenHeight/50,),
+                        Text('file types: .csv, .xlsx, .shp, .odt',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: screenWidth/50,
-                          ),),
-                        SizedBox(width: screenWidth/50,),
-                        Icon(Icons.upload_file_outlined,
-                          color: const Color.fromRGBO(196, 102, 12, 1),
-                          size: screenWidth/30,
-                        )
+                              color: Colors.white,
+                              fontSize: screenWidth/80,
+                              fontWeight: FontWeight.w500
+                          ),)
                       ],
                     ),
-                    SizedBox(height: screenHeight/50,),
-                    Text('file types: .csv, .xlsx, .shp, .odt',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: screenWidth/80,
-                          fontWeight: FontWeight.w500
-                      ),)
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
+            SizedBox(height: screenHeight/10,),
           ],
         ),
       ),
