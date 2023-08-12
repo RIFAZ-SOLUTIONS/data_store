@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fuzzy/fuzzy.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -52,10 +53,12 @@ class _HomePageState extends State<HomePage> {
       };
     }
 
-    final RegExp regExp = RegExp(query, caseSensitive: false);
+    // final RegExp regExp = RegExp(query, caseSensitive: false);
 
     values.forEach((key, value) {
-      if (regExp.hasMatch(value['title'])){
+      final List<dynamic> matches = Fuzzy(value['title'].toString().trim().split(' '), options: FuzzyOptions(threshold: 0.72)).search(query);
+      // regExp.hasMatch(value['title'])
+      if (matches.isNotEmpty){
         updatedSuggestions.add(value);
       }
     });
