@@ -287,20 +287,42 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           trailing: SizedBox(
-                            width: screenWidth/50,
+                            width: screenWidth/20,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Flexible(
-                                  child: IconButton(
-                                      onPressed: () async{
-                                        await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
-                                      },
-                                      icon: const Icon(Icons.preview_outlined,
-                                      color: Color.fromRGBO(196, 102, 12, 1),
-                                      )
+                                  child: Tooltip(
+                                    message: 'preview',
+                                    preferBelow: false,
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromRGBO(0, 101, 168, 1),
+                                    ),
+                                    child: IconButton(
+                                        onPressed: () async{
+                                          await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
+                                        },
+                                        icon: const Icon(Icons.preview_outlined,
+                                        color: Color.fromRGBO(196, 102, 12, 1),
+                                        )
+                                    ),
                                   ),
-                                )
+                                ),
+                                Flexible(
+                                  child: Tooltip(
+                                    message: 'download',
+                                    preferBelow: false,
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromRGBO(0, 101, 168, 1),
+                                    ),
+                                    child: IconButton(
+                                        onPressed: () async{},
+                                        icon: const Icon(Icons.download_for_offline_outlined,
+                                        color: Color.fromRGBO(196, 102, 12, 1),
+                                        )
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
