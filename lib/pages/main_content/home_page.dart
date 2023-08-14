@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
@@ -284,6 +285,24 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.bold
                               ),),
                             ],
+                          ),
+                          trailing: SizedBox(
+                            width: screenWidth/50,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Flexible(
+                                  child: IconButton(
+                                      onPressed: () async{
+                                        await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
+                                      },
+                                      icon: const Icon(Icons.preview_outlined,
+                                      color: Color.fromRGBO(196, 102, 12, 1),
+                                      )
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                           textColor: Colors.black,
                           tileColor: Colors.white54,
