@@ -335,6 +335,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                           textColor: Colors.black,
                           tileColor: Colors.white54,
+                          onTap: () async{
+                            await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
+                          },
                         ),
                       ),
                     ],
