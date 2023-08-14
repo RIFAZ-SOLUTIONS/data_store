@@ -249,7 +249,14 @@ class _HomePageState extends State<HomePage> {
                             )
                           ]
                         ),
-                        child: ListTile(
+                        child: suggestions[index]['title'] == 'No results' ? ListTile(
+                            title: Text(suggestions[index]['title'],
+                              style: const TextStyle(
+                                   fontWeight: FontWeight.bold
+                                 ),
+                            ),
+                        ) :
+                        ListTile(
                           title: Text(suggestions[index]['title'],
                           style: const TextStyle(
                             fontWeight: FontWeight.bold

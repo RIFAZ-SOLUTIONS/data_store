@@ -76,7 +76,7 @@ Future<void> datasetPreview(context, String title, String date) async{
                 icon: const Text(
                   'Download',
                   style: TextStyle(
-                    color: Color.fromRGBO(196, 102, 12, 1)
+                    color: Color.fromRGBO(196, 102, 12, 1),
                   ),
                 ),
               color: const Color.fromRGBO(196, 102, 12, 1),
