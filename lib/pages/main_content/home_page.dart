@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
+import 'package:data_store/utility/database.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
@@ -20,18 +21,10 @@ class _HomePageState extends State<HomePage> {
     'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
   ];
   final MaterialStateProperty<Color> searchBarColor = MaterialStateProperty.all(Colors.white);
-  final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
   final TextEditingController searchController = TextEditingController();
+  final DatabaseService database = DatabaseService();
   List<dynamic> suggestions = [];
   late DatabaseEvent event;
-
-  Future<DatabaseEvent> fetchData() async{
-    final DatabaseReference ref = rtDatabase.ref('datasets');
-    final DatabaseEvent event = await ref
-        .orderByChild('title')
-        .once();
-    return event;
-  }
 
   Future<void> fetchSuggestions(String query) async {
     if (query.isEmpty) {
@@ -196,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                         onTap: () async{
-                          final DatabaseEvent currentEvent = await fetchData();
+                          final DatabaseEvent currentEvent = await database.fetchData();
                           setState(() {
                             event = currentEvent;
                           });
@@ -350,7 +343,9 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () async{
+                    await datasetInput(context);
+                  },
                   child: Container(
                     height: screenHeight / 5,
                     width: screenWidth / 4,
