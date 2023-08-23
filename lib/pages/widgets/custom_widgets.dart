@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:data_store/utility/database.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +14,7 @@ Future<void> showErrorDialog(context,String error) async{
       return AlertDialog(
         title: const Text('Warning',
           style: TextStyle(
-              color: Color.fromRGBO(0, 189, 20, 1)
+              color: Color.fromRGBO(196, 102, 12, 1)
           ),
         ),
         actions: [
@@ -158,6 +161,9 @@ class InputDetails extends StatefulWidget {
 class _InputDetailsState extends State<InputDetails> {
   final _formKey = GlobalKey<FormState>();
   final DatabaseService database = DatabaseService();
+  int fileSizeLimit = 3*1024*1024;
+  late int fileSize;
+  late String? fileType;
   late Uint8List fileBytes;
   late String fileName;
   late bool isUploaded;
@@ -186,6 +192,7 @@ class _InputDetailsState extends State<InputDetails> {
     description = '';
     category = '';
     fileName = '';
+    fileSize = 0;
     fileBytes = Uint8List(0);
     isUploaded = false;
   }
@@ -213,16 +220,21 @@ class _InputDetailsState extends State<InputDetails> {
             children: [
               InkWell(
                 onTap: () async{
-                  FilePickerResult? result = await FilePicker.platform.pickFiles();
+                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['csv','pdf','xlsx','odt'],
+                  );
                   if (result != null) {
                     setState(() {
                       isUploaded = true;
                       fileName = result.files.first.name;
                       fileBytes = result.files.first.bytes!;
+                      fileSize = result.files.first.size;
+                      fileType = result.files.first.extension;
                     });
-
-                    // Upload file
-                    // await FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes);
+                    if(fileSize>fileSizeLimit){
+                      if(context.mounted) await showErrorDialog(context, 'File size is greater than 3MB!');
+                    }
                   }
                 },
                 child: Container(
@@ -349,18 +361,25 @@ class _InputDetailsState extends State<InputDetails> {
           SizedBox(height: screenHeight/20,),
           InkWell(
             onTap: () async{
-              if (_formKey.currentState!.validate()){
+              if (_formKey.currentState!.validate() && isUploaded && fileSize<fileSizeLimit){
+                final String newFileName = '${fileName.split('.')[0]}${Random().nextInt(1000)}.$fileType';
+                final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(3);
                 final Map<String, dynamic> fileData = {
                   'title': title,
+                  'fileName': newFileName,
                   'description': description,
                   'category': category,
                   'tags': [],
                   'added': DateFormat('dd-MM-yyyy').format(DateTime.now()),
                   'dimensions': '12 \u00D7 400',
-                  'filetype': '.CSV'
+                  'downloads': 0,
+                  'filetype': '.${fileType!.toUpperCase()}',
+                  'fileSize': '${newFileSize}MB',
                 };
                 try {
+                  // TODO add loading overlay
                   await database.addFile(fileData);
+                  await FirebaseStorage.instance.ref('uploads/$newFileName').putData(fileBytes);
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(

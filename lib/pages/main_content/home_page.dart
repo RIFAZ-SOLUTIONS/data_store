@@ -384,7 +384,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         SizedBox(height: screenHeight/50,),
-                        Text('file types: .csv, .xlsx, .shp, .odt',
+                        Text('file types: .csv, .xlsx, .pdf, .odt',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: screenWidth/80,
