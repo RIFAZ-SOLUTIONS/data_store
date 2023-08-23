@@ -11,7 +11,7 @@ class DatabaseService{
     return event;
   }
 
-  Future<void> addFile() async{
+  Future<void> addFile(Map<String,dynamic> fileData) async{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets');
     // await ref.update({
@@ -22,12 +22,7 @@ class DatabaseService{
     //     }
     //   }
     // });
-    await ref.push().update({
-      "added":'22/08/2023',
-      "title":"Ukwaju wetuuu",
-      "userId": "useruser123"
-    });
-
+    await ref.push().update(fileData);
   }
 
 }

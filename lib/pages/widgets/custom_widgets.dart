@@ -1,4 +1,40 @@
+import 'package:data_store/utility/database.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+Future<void> showErrorDialog(context,String error) async{
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Warning',
+          style: TextStyle(
+              color: Color.fromRGBO(0, 189, 20, 1)
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Okay'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(error),
+              const Text('Please try again!'),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
 Future<void> datasetPreview(context, String title, String date) async{
   final screenHeight = MediaQuery.of(context).size.height;
@@ -121,12 +157,18 @@ class InputDetails extends StatefulWidget {
 
 class _InputDetailsState extends State<InputDetails> {
   final _formKey = GlobalKey<FormState>();
+  final DatabaseService database = DatabaseService();
+  late Uint8List fileBytes;
+  late String fileName;
+  late bool isUploaded;
   late String title;
   late String description;
+  late String category;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController dropdownMenuController = TextEditingController();
 
-  final List<String> categories = ['Finance', 'Economics', 'Agriculture', 'Medicine', 'Education'];
+  final List<String> categories = ['Finance', 'Economics', 'Agriculture', 'Medicine', 'Education', 'Other'];
 
   List<DropdownMenuEntry> createCategories(List<String> categories){
     final List<DropdownMenuEntry> categoryList = [];
@@ -142,6 +184,10 @@ class _InputDetailsState extends State<InputDetails> {
     super.initState();
     title = '';
     description = '';
+    category = '';
+    fileName = '';
+    fileBytes = Uint8List(0);
+    isUploaded = false;
   }
 
   @override
@@ -163,6 +209,54 @@ class _InputDetailsState extends State<InputDetails> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Row(
+            children: [
+              InkWell(
+                onTap: () async{
+                  FilePickerResult? result = await FilePicker.platform.pickFiles();
+                  if (result != null) {
+                    setState(() {
+                      isUploaded = true;
+                      fileName = result.files.first.name;
+                      fileBytes = result.files.first.bytes!;
+                    });
+
+                    // Upload file
+                    // await FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes);
+                  }
+                },
+                child: Container(
+                  width: screenWidth/10,
+                  height: screenHeight/16,
+                  decoration: const BoxDecoration(
+                    color: Color.fromRGBO(196, 102, 12, 1),
+                  ),
+                  child: const Center(
+                    child: Text('Upload a file',
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 1),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: screenWidth/60,),
+              Visibility(
+                visible: isUploaded,
+                child: SizedBox(
+                  width: screenWidth/8,
+                  child: Text(fileName,
+                    style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(height: screenHeight/20,),
           Container(
             height: screenHeight/10,
             width: screenWidth/4,
@@ -229,19 +323,73 @@ class _InputDetailsState extends State<InputDetails> {
             ),
           ),
           SizedBox(height: screenHeight/20,),
-          DropdownMenu(
-            dropdownMenuEntries: createCategories(categories),
-            label: const Text('Select Category'),
-            menuStyle: MenuStyle(
-                elevation: MaterialStateProperty.all(2),
-                side: MaterialStateProperty.all(const BorderSide(
-                    color: Color.fromRGBO(196, 102, 12, 1),
-                    width: 2,
-                    style: BorderStyle.solid
-                ),),
+          Flexible(
+            child: DropdownMenu(
+              controller: dropdownMenuController,
+              dropdownMenuEntries: createCategories(categories),
+              label: const Text('Select Category'),
+              menuStyle: MenuStyle(
+                  elevation: MaterialStateProperty.all(2),
+                  side: MaterialStateProperty.all(const BorderSide(
+                      color: Color.fromRGBO(196, 102, 12, 1),
+                      width: 2,
+                      style: BorderStyle.solid
+                  ),),
+              ),
+              width: screenWidth/4,
+              initialSelection: 'Finance',
+              onSelected: (value) {
+                setState(() {
+                  category = dropdownMenuController.text;
+                });
+              },
+              errorText: category.isEmpty? 'Empty' : null,
             ),
-            width: screenWidth/4,
-            initialSelection: 'Finance',
+          ),
+          SizedBox(height: screenHeight/20,),
+          InkWell(
+            onTap: () async{
+              if (_formKey.currentState!.validate()){
+                final Map<String, dynamic> fileData = {
+                  'title': title,
+                  'description': description,
+                  'category': category,
+                  'tags': [],
+                  'added': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                  'dimensions': '12 \u00D7 400',
+                  'filetype': '.CSV'
+                };
+                try {
+                  await database.addFile(fileData);
+                  if(context.mounted) Navigator.of(context).pop();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
+                      content: Center(child: Text('File is uploaded!')),
+                      duration: Duration(seconds: 3),
+                      backgroundColor: Color.fromRGBO(196, 102, 12, 1),
+                      )
+                    );
+                  }
+                } catch(_){
+                  await showErrorDialog(context, _.toString());
+                }
+              }
+            },
+            child: Container(
+              width: screenWidth/10,
+              height: screenHeight/16,
+              decoration: const BoxDecoration(
+                color: Color.fromRGBO(196, 102, 12, 1),
+              ),
+              child: const Center(
+                child: Text('Submit',
+                  style: TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 1),
+                      fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           )
         ],
       ),
