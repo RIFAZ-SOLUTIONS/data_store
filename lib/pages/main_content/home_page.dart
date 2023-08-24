@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
+import 'package:data_store/utility/functions.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Map<String,dynamic> previewInput;
   late bool isVisible;
   final ScrollController scrollController = ScrollController();
   final List<String> imgList = [
@@ -26,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> suggestions = [];
   late DatabaseEvent event;
 
-  Future<void> fetchSuggestions(String query) async {
+  Future<void> fetchSuggestions(query) async {
     if (query.isEmpty) {
       setState(() {
         suggestions = [];
@@ -75,6 +77,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     isVisible = false;
+    previewInput = {};
     super.initState();
   }
 
@@ -256,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                           ),),
                           subtitle: Row(
                             children: [
-                              Text('Date added: ${suggestions[index]["added"]}'),
+                              Text('Date added: ${suggestions[index]["dateAdded"]}'),
                               SizedBox(width: screenWidth/120,),
                               Text('Category: ${suggestions[index]["category"]}'),
                               SizedBox(width: screenWidth/120,),
@@ -268,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(10)
                                 ),
                                 child: Center(
-                                  child: Text(suggestions[index]["filetype"].toString().toUpperCase(),
+                                  child: Text(suggestions[index]["fileType"],
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: screenWidth/110,
@@ -300,7 +303,20 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: IconButton(
                                         onPressed: () async{
-                                          await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
+                                          setState(() {
+                                            previewInput = {
+                                              'title': suggestions[index]['title'],
+                                              'description': suggestions[index]['description'],
+                                              'fileType': suggestions[index]['fileType'],
+                                              'fileSize': suggestions[index]['fileSize'],
+                                              'dateAdded': suggestions[index]['dateAdded'],
+                                              'downloadLink': suggestions[index]['downloadLink'],
+                                            };
+                                          });
+                                          await datasetPreview(
+                                            context,
+                                            previewInput,
+                                          );
                                         },
                                         icon: const Icon(Icons.preview_outlined,
                                         color: Color.fromRGBO(196, 102, 12, 1),
@@ -316,7 +332,10 @@ class _HomePageState extends State<HomePage> {
                                       color: Color.fromRGBO(0, 101, 168, 1),
                                     ),
                                     child: IconButton(
-                                        onPressed: () async{},
+                                        onPressed: () {
+                                          final String url = suggestions[index]['downloadLink'];
+                                          downloadFile(url);
+                                        },
                                         icon: const Icon(Icons.download_for_offline_outlined,
                                         color: Color.fromRGBO(196, 102, 12, 1),
                                         )
@@ -329,7 +348,20 @@ class _HomePageState extends State<HomePage> {
                           textColor: Colors.black,
                           tileColor: Colors.white54,
                           onTap: () async{
-                            await datasetPreview(context, suggestions[index]['title'], suggestions[index]['added']);
+                            setState(() {
+                              previewInput = {
+                                'title': suggestions[index]['title'],
+                                'description': suggestions[index]['description'],
+                                'fileType': suggestions[index]['fileType'],
+                                'fileSize': suggestions[index]['fileSize'],
+                                'dateAdded': suggestions[index]['dateAdded'],
+                                'downloadLink': suggestions[index]['downloadLink'],
+                              };
+                            });
+                            await datasetPreview(
+                              context,
+                              previewInput
+                            );
                           },
                         ),
                       ),

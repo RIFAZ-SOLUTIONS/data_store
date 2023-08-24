@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:data_store/utility/database.dart';
+import 'package:data_store/utility/functions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -39,7 +40,7 @@ Future<void> showErrorDialog(context,String error) async{
 }
 
 
-Future<void> datasetPreview(context, String title, String date) async{
+Future<void> datasetPreview(context, Map<String,dynamic> previewInput) async{
   final screenHeight = MediaQuery.of(context).size.height;
   final screenWidth = MediaQuery.of(context).size.width;
 
@@ -63,43 +64,25 @@ Future<void> datasetPreview(context, String title, String date) async{
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
+              Text(previewInput['title'],
                 style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: screenWidth/50,
                 ),
               ),
-              const Text(' Egestas fringilla phasellus faucibus scelerisque eleifend donec pretium.\n'
-                  ' Diam maecenas sed enim ut sem viverra aliquet. Facilisi cras fermentum odio eu feugiat pretium nibh ipsum.\n'
-                  ' Nunc aliquet bibendum enim facilisis gravida neque convallis. Accumsan tortor posuere ac ut.\n'
-                  ' Ac turpis egestas maecenas pharetra convallis posuere morbi leo.\n'
-                  ' Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum.\n'
-                  ' Elementum eu facilisis sed odio morbi quis commodo. Nisi est sit amet facilisis magna etiam tempor.\n'
-                  ' Nunc lobortis mattis aliquam faucibus purus. Viverra adipiscing at in tellus.\n'
-                  ' Et tortor consequat id porta nibh. Sit amet luctus venenatis lectus magna.',
-              ),
+              Text(previewInput['description']),
                SizedBox(height: screenHeight/20,),
-              const Text('Tags: Column A, Column B, Column C, Column D',
-                  style: TextStyle(
+              Text('Type: ${previewInput['fileType']}',
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   )
               ),
-               const Text('Dimensions: 12 \u00D7 400',
-                  style: TextStyle(
+              Text('Size: ${previewInput['fileSize']}',
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   )
               ),
-              const Text('Type: .CSV',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                  )
-              ),
-              const Text('Size: 3.0 MB',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                  )
-              ),
-              Text('Date added: $date',
+              Text('Date added: ${previewInput['dateAdded']}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   )
@@ -108,7 +91,9 @@ Future<void> datasetPreview(context, String title, String date) async{
           ),
           actions: [
             IconButton.outlined(
-              onPressed: () {},
+              onPressed: () {
+                downloadFile(previewInput['downloadLink']);
+              },
               style: ButtonStyle(
                 side: MaterialStateProperty.all( const BorderSide(color: Color.fromRGBO(196, 102, 12, 1)))
               ),
@@ -127,7 +112,6 @@ Future<void> datasetPreview(context, String title, String date) async{
 
 Future<void> datasetInput(context) async{
   final screenHeight = MediaQuery.of(context).size.height;
-  final screenWidth = MediaQuery.of(context).size.width;
 
   return showDialog(
       context: context,
@@ -369,17 +353,17 @@ class _InputDetailsState extends State<InputDetails> {
                   'fileName': newFileName,
                   'description': description,
                   'category': category,
-                  'tags': [],
-                  'added': DateFormat('dd-MM-yyyy').format(DateTime.now()),
-                  'dimensions': '12 \u00D7 400',
+                  'dateAdded': DateFormat('dd-MM-yyyy').format(DateTime.now()),
                   'downloads': 0,
-                  'filetype': '.${fileType!.toUpperCase()}',
+                  'fileType': '.${fileType!.toUpperCase()}',
                   'fileSize': '${newFileSize}MB',
                 };
                 try {
                   // TODO add loading overlay
-                  await database.addFile(fileData);
+                  final String datasetID = await database.addFile(fileData);
                   await FirebaseStorage.instance.ref('uploads/$newFileName').putData(fileBytes);
+                  final String downloadLink = await FirebaseStorage.instance.ref('uploads/$newFileName').getDownloadURL();
+                  await database.addDownloadLink(downloadLink, datasetID);
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(

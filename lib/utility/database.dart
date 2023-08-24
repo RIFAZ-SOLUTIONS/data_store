@@ -11,11 +11,20 @@ class DatabaseService{
     return event;
   }
 
-  Future<void> addFile(Map<String,dynamic> fileData) async{
+  Future<String> addFile(Map<String,dynamic> fileData) async{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets');
-    await ref.push().update(fileData);
+    final String? key = ref.push().key;
+    final DatabaseReference newRef = rtDatabase.ref('datasets/$key');
+    await newRef.update(fileData);
+    return key!;
   }
 
-
+  Future<void> addDownloadLink(String downloadLink, String datasetID) async{
+    final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
+    final DatabaseReference ref = rtDatabase.ref('datasets/$datasetID');
+    await ref.update({
+      'downloadLink': downloadLink
+    });
+  }
 }
