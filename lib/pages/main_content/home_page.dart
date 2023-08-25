@@ -152,19 +152,13 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ): Container(
-              width: screenWidth/5,
+              width: screenWidth/4.5,
               height: screenHeight/14,
               decoration: BoxDecoration(
                 color: const Color.fromRGBO(0, 101, 168, 1),
                 borderRadius: BorderRadius.circular(10)
               ),
               child: ListTile(
-                // leading: CircleAvatar(
-                //   backgroundColor: Colors.white,
-                //   radius: screenWidth/50,
-                //   child: Image.network(currentUser!.photoUrl!,
-                //   fit: BoxFit.contain,),
-                // ),
                 leading: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,6 +193,26 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w400
                 ),
                   overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: screenWidth/50,
+                      height: screenWidth/50,
+                      child: Tooltip(
+                        message: 'Sign out',
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () => auth.handleSignOut(),
+                          icon: const Icon(Icons.logout_outlined,
+                            color: Color.fromRGBO(196, 102, 12, 1),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
