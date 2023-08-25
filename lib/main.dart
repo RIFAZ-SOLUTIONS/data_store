@@ -1,4 +1,5 @@
 import 'package:data_store/firebase_options.dart';
+import 'package:data_store/pages/authentication/sign_up_page.dart';
 import 'package:data_store/pages/main_content/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
             seedColor: const Color.fromRGBO(196, 102, 12, 1)),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const SingUpPage(),
     );
   }
 }

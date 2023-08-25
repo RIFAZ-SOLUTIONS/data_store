@@ -5,3 +5,9 @@
 4. Edit the **package.json** file under `scripts` add "build"**:** "flutter build web" 
 5. Edit the .yml files in .github/workflows and add this under *steps* at **run** section:
          `sudo snap install flutter --classic && npm ci && npm run build`
+
+## Activate SignIn with Google One Tap
+1. Add authentication provider in the firebase console.
+2. Follow the example from https://github.com/flutter/packages/blob/main/packages/google_sign_in/google_sign_in/example/lib/main.dart and add the `stub.dart` and `web.dart` files with the same structure as the one shown in data_store repository.
+3. Get your Google API Client ID by following these instructions here: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#one-tap
+4. Add the OAuth client ID to the clientId option in GoogleSignIn class.
