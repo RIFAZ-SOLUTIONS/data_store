@@ -11,5 +11,9 @@ import 'stub.dart';
 /// Renders a web-only SIGN IN button.
 Widget buildSignInButton({HandleSignInFn? onPressed}) {
   return (GoogleSignInPlatform.instance as web.GoogleSignInPlugin)
-      .renderButton();
+      .renderButton(
+    configuration: web.GSIButtonConfiguration(
+      locale: 'EN'
+    )
+  );
 }

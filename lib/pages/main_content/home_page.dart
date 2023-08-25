@@ -1,10 +1,16 @@
+import 'dart:js_interop';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:data_store/pages/authentication/authentication.dart';
+import 'package:data_store/pages/authentication/web.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +22,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Map<String,dynamic> previewInput;
   late bool isVisible;
+  GoogleSignInAccount? currentUser;
+  bool isAuthorized = false;
   final ScrollController scrollController = ScrollController();
   final List<String> imgList = [
     'https://images.unsplash.com/photo-1691071716244-db306a482fc0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80',
@@ -25,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   final MaterialStateProperty<Color> searchBarColor = MaterialStateProperty.all(Colors.white);
   final TextEditingController searchController = TextEditingController();
   final DatabaseService database = DatabaseService();
+  final AuthService auth = AuthService();
   List<dynamic> suggestions = [];
   late DatabaseEvent event;
 
@@ -78,6 +87,19 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     isVisible = false;
     previewInput = {};
+
+    auth.googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async{
+      if (kIsWeb && account != null) {
+        isAuthorized = await auth.googleSignIn.canAccessScopes(auth.scopes);
+      }
+
+      setState(() {
+        currentUser = account;
+        isAuthorized = isAuthorized;
+      });
+
+      auth.googleSignIn.signInSilently();
+    });
     super.initState();
   }
 
@@ -100,25 +122,68 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.white60,
       appBar: AppBar(
         elevation: 3,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('The DataStore',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 27
-            ),
-            ),
-            SizedBox(width: screenWidth/130,),
-            const Text('Portal',
-            style: TextStyle(
-              color: Color.fromRGBO(196, 102, 12, 1),
-              fontSize: 27,
-              fontWeight: FontWeight.bold,
-            ),
-            ),
-          ],
+        title: Padding(
+          padding: EdgeInsets.only(left: screenWidth/6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('The DataStore',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 27
+              ),
+              ),
+              SizedBox(width: screenWidth/130,),
+              const Text('Portal',
+              style: TextStyle(
+                color: Color.fromRGBO(196, 102, 12, 1),
+                fontSize: 27,
+                fontWeight: FontWeight.bold,
+              ),
+              ),
+            ],
+          ),
         ),
+        actions: <Widget>[
+          Container(
+            child: currentUser.isNull ? buildSignInButton(
+              onPressed: () async{
+                final bool authorized = await auth.handleAuthorizeScopes();
+                setState(() {
+                  isAuthorized = authorized;
+                });
+              },
+            ): Container(
+              width: screenWidth/5.5,
+              height: screenHeight/16,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(0, 101, 168, 1),
+                borderRadius: BorderRadius.circular(10)
+              ),
+              child: ListTile(
+                tileColor: const Color.fromRGBO(0, 101, 168, 1),
+                dense: true,
+                visualDensity: const VisualDensity(
+                  vertical: -4.0,
+                ),
+                title: Text(currentUser?.displayName ?? 'user',
+                style: TextStyle(
+                  color: const Color.fromRGBO(196, 102, 12, 1),
+                  fontSize: screenWidth/100,
+                  fontWeight: FontWeight.w600
+                  ),
+                ),
+                subtitle: Text(currentUser!.email,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth/100,
+                    fontWeight: FontWeight.w400
+                ),
+                ),
+              ),
+            ),
+          ),
+        ],
         automaticallyImplyLeading: false,
         bottomOpacity: 3.5,
         shadowColor: const Color.fromRGBO(50, 94, 135, 1),
@@ -376,6 +441,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 InkWell(
                   onTap: () async{
+                    print(currentUser?.displayName);
                     await datasetInput(context);
                   },
                   child: Container(

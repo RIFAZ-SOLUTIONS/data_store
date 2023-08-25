@@ -8,14 +8,14 @@ const List<String> scopes = <String>[
   'email',
 ];
 
-class SingUpPage extends StatefulWidget {
-  const SingUpPage({super.key});
+class SignInButton extends StatefulWidget {
+  const SignInButton({super.key});
 
   @override
-  State<SingUpPage> createState() => _SingUpPageState();
+  State<SignInButton> createState() => _SingUpPageState();
 }
 
-class _SingUpPageState extends State<SingUpPage> {
+class _SingUpPageState extends State<SignInButton> {
   late GoogleSignInAccount? currentUser;
   bool isAuthorized = false;
 
@@ -54,32 +54,21 @@ class _SingUpPageState extends State<SingUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox(
-        // child: TextButton(
-        //   onPressed: () async{
-        //     await handleAuthorizeScopes();
-        //     print(currentUser);
-        //   },
-        //   child: const Text('Sign In'),
-        // ),
-        child: Container(
-          decoration: const BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(196, 102, 12, 0.8),
-                  offset: Offset(0,3),
-                  blurRadius: 6,
-                )
-              ]
-          ),
-          child: buildSignInButton(
-            onPressed: () async{
-              await handleAuthorizeScopes();
-              print(currentUser);
-            },
-          ),
-        ),
+    return Container(
+      decoration: const BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(196, 102, 12, 0.8),
+              offset: Offset(0,3),
+              blurRadius: 6,
+            )
+          ],
+      ),
+      child: buildSignInButton(
+        onPressed: () async{
+          await handleAuthorizeScopes();
+          // TODO add setState here
+        },
       ),
     );
   }

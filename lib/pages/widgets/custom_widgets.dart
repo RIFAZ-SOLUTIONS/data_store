@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:data_store/pages/authentication/stub.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 
 Future<void> showErrorDialog(context,String error) async{
