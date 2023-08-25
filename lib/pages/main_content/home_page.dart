@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
 import 'package:data_store/pages/authentication/web.dart';
@@ -146,7 +144,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: <Widget>[
           Container(
-            child: currentUser.isNull ? buildSignInButton(
+            child: currentUser == null ? buildSignInButton(
               onPressed: () async{
                 final bool authorized = await auth.handleAuthorizeScopes();
                 setState(() {
@@ -463,7 +461,6 @@ class _HomePageState extends State<HomePage> {
               children: [
                 InkWell(
                   onTap: () async{
-                    print(currentUser?.displayName);
                     await datasetInput(context);
                   },
                   child: Container(
