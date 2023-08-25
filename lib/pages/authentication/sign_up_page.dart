@@ -1,4 +1,5 @@
 import 'package:data_store/pages/authentication/web.dart';
+import 'package:data_store/utility/functions.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,8 +20,7 @@ class _SingUpPageState extends State<SingUpPage> {
   bool isAuthorized = false;
 
   GoogleSignIn googleSignIn = GoogleSignIn(
-    // Optional clientId
-    clientId: '1094134202046-r6itlfp4v9jhki7rk707v6fu54q5oedc.apps.googleusercontent.com',
+    clientId: getClientID(),
     scopes: scopes,
   );
 
