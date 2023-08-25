@@ -154,17 +154,37 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ): Container(
-              width: screenWidth/5.5,
-              height: screenHeight/16,
+              width: screenWidth/5,
+              height: screenHeight/14,
               decoration: BoxDecoration(
                 color: const Color.fromRGBO(0, 101, 168, 1),
                 borderRadius: BorderRadius.circular(10)
               ),
               child: ListTile(
+                // leading: CircleAvatar(
+                //   backgroundColor: Colors.white,
+                //   radius: screenWidth/50,
+                //   child: Image.network(currentUser!.photoUrl!,
+                //   fit: BoxFit.contain,),
+                // ),
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: screenWidth/50,
+                      height: screenWidth/50,
+                      child: GoogleUserCircleAvatar(
+                          identity: currentUser!,
+                      ),
+                    ),
+                  ],
+                ),
                 tileColor: const Color.fromRGBO(0, 101, 168, 1),
                 dense: true,
                 visualDensity: const VisualDensity(
                   vertical: -4.0,
+                  horizontal: 1.0,
                 ),
                 title: Text(currentUser?.displayName ?? 'user',
                 style: TextStyle(
@@ -172,6 +192,7 @@ class _HomePageState extends State<HomePage> {
                   fontSize: screenWidth/100,
                   fontWeight: FontWeight.w600
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Text(currentUser!.email,
                 style: TextStyle(
@@ -179,6 +200,7 @@ class _HomePageState extends State<HomePage> {
                     fontSize: screenWidth/100,
                     fontWeight: FontWeight.w400
                 ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
