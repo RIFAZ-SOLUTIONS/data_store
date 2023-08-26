@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -41,7 +41,7 @@ Future<void> showErrorDialog(context,String error) async{
 }
 
 
-Future<void> datasetPreview(context, Map<String,dynamic> previewInput, GoogleSignInAccount? currentUser) async{
+Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? currentUser) async{
   final screenHeight = MediaQuery.of(context).size.height;
   final screenWidth = MediaQuery.of(context).size.width;
   GlobalKey toolTipKey = GlobalKey();
@@ -121,7 +121,7 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput, GoogleSig
       },);
 }
 
-Future<void> datasetInput(context) async{
+Future<void> datasetInput(context, User? currentUser) async{
   final screenHeight = MediaQuery.of(context).size.height;
 
   return showDialog(
@@ -140,14 +140,15 @@ Future<void> datasetInput(context) async{
             color: const Color.fromRGBO(196, 102, 12, 1),
             size: screenHeight/20,
             ),
-          content: const InputDetails(),
+          content: InputDetails(user: currentUser,),
         );
       },
   );
 }
 
 class InputDetails extends StatefulWidget {
-  const InputDetails({super.key});
+  final User? user;
+  const InputDetails({super.key, this.user});
 
   @override
   State<InputDetails> createState() => _InputDetailsState();
@@ -360,6 +361,7 @@ class _InputDetailsState extends State<InputDetails> {
                 final String newFileName = '${fileName.split('.')[0]}${Random().nextInt(1000)}.$fileType';
                 final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(3);
                 final Map<String, dynamic> fileData = {
+                  'userId': widget.user?.uid,
                   'title': title,
                   'fileName': newFileName,
                   'description': description,
@@ -371,9 +373,9 @@ class _InputDetailsState extends State<InputDetails> {
                 };
                 try {
                   // TODO add loading overlay
+                  final String filePath = '${widget.user?.uid}/$newFileName';
+                  final String downloadLink = await database.storeFile(filePath, fileBytes);
                   final String datasetID = await database.addFile(fileData);
-                  await FirebaseStorage.instance.ref('uploads/$newFileName').putData(fileBytes);
-                  final String downloadLink = await FirebaseStorage.instance.ref('uploads/$newFileName').getDownloadURL();
                   await database.addDownloadLink(downloadLink, datasetID);
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {

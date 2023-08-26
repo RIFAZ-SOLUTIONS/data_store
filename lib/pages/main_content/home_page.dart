@@ -4,6 +4,7 @@ import 'package:data_store/pages/authentication/web.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -20,8 +21,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Map<String,dynamic> previewInput;
   late bool isVisible;
-  GoogleSignInAccount? currentUser;
+  User? currentUser;
   bool isAuthorized = false;
+  bool isSignedIn = false;
   final ScrollController scrollController = ScrollController();
   final List<String> imgList = [
     'https://images.unsplash.com/photo-1691071716244-db306a482fc0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80',
@@ -86,18 +88,21 @@ class _HomePageState extends State<HomePage> {
     isVisible = false;
     previewInput = {};
 
-    auth.googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async{
-      if (kIsWeb && account != null) {
-        isAuthorized = await auth.googleSignIn.canAccessScopes(auth.scopes);
-      }
-
-      setState(() {
-        currentUser = account;
-        isAuthorized = isAuthorized;
-      });
-
-      auth.googleSignIn.signInSilently();
-    });
+    // auth.googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async{
+    //   if (kIsWeb && account != null) {
+    //     isAuthorized = await auth.googleSignIn.canAccessScopes(auth.scopes);
+    //   }
+    //
+    //   final UserCredential credentials = await auth.signInWithGoogle();
+    //
+    //   setState(() {
+    //     // currentUser = account;
+    //     currentUser = credentials.user;
+    //     isAuthorized = isAuthorized;
+    //   });
+    //
+    //   // auth.googleSignIn.signInSilently();
+    // });
     super.initState();
   }
 
@@ -144,14 +149,17 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: <Widget>[
           Container(
-            child: currentUser == null ? buildSignInButton(
-              onPressed: () async{
-                final bool authorized = await auth.handleAuthorizeScopes();
-                setState(() {
-                  isAuthorized = authorized;
-                });
-              },
-            ): Container(
+            child:  currentUser == null ?
+            TextButton(
+                onPressed: () async{
+                  final UserCredential credentials = await auth.signInWithGoogle();
+                  setState(() {
+                    currentUser = credentials.user;
+                  });
+                },
+                child: const Text('Sign In')
+            ):
+            Container(
               width: screenWidth/4.5,
               height: screenHeight/14,
               decoration: BoxDecoration(
@@ -166,9 +174,10 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(
                       width: screenWidth/50,
                       height: screenWidth/50,
-                      child: GoogleUserCircleAvatar(
-                          identity: currentUser!,
-                      ),
+                      child: CircleAvatar(
+                        radius: screenWidth/50,
+                        child: Image.network(currentUser!.photoURL!),
+                      )
                     ),
                   ],
                 ),
@@ -186,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                subtitle: Text(currentUser!.email,
+                subtitle: Text(currentUser!.email!,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: screenWidth/100,
@@ -205,7 +214,14 @@ class _HomePageState extends State<HomePage> {
                         message: 'Sign out',
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          onPressed: () => auth.handleSignOut(),
+                          onPressed: () async{
+                            await auth.handleSignOut();
+                            await auth.signOutWithGoogle();
+                            setState(() {
+                              currentUser = null;
+                            });
+
+                          },
                           icon: const Icon(Icons.logout_outlined,
                             color: Color.fromRGBO(196, 102, 12, 1),
                           ),
@@ -483,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                 InkWell(
                   onTap: () async{
                     if(currentUser != null){
-                      await datasetInput(context);
+                      await datasetInput(context,currentUser);
                     } else {
                       await showErrorDialog(context, 'You must Sign in, to upload a file.');
                     }

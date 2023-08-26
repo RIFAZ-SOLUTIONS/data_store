@@ -1,4 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 
 class DatabaseService{
 
@@ -18,6 +20,12 @@ class DatabaseService{
     final DatabaseReference newRef = rtDatabase.ref('datasets/$key');
     await newRef.update(fileData);
     return key!;
+  }
+
+  Future<String> storeFile(String filePath, Uint8List fileBytes ) async{
+    await FirebaseStorage.instance.ref(filePath).putData(fileBytes);
+    final String downloadLink = await FirebaseStorage.instance.ref(filePath).getDownloadURL();
+    return downloadLink;
   }
 
   Future<void> addDownloadLink(String downloadLink, String datasetID) async{
