@@ -88,6 +88,14 @@ class _HomePageState extends State<HomePage> {
     isVisible = false;
     previewInput = {};
 
+    // This stream makes the user to persist between sessions
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        setState(() {
+          currentUser = user;
+        });
+      }
+    });
     // auth.googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async{
     //   if (kIsWeb && account != null) {
     //     isAuthorized = await auth.googleSignIn.canAccessScopes(auth.scopes);
