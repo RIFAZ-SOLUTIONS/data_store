@@ -1,15 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
-import 'package:data_store/pages/authentication/web.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -96,21 +93,6 @@ class _HomePageState extends State<HomePage> {
         });
       }
     });
-    // auth.googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) async{
-    //   if (kIsWeb && account != null) {
-    //     isAuthorized = await auth.googleSignIn.canAccessScopes(auth.scopes);
-    //   }
-    //
-    //   final UserCredential credentials = await auth.signInWithGoogle();
-    //
-    //   setState(() {
-    //     // currentUser = account;
-    //     currentUser = credentials.user;
-    //     isAuthorized = isAuthorized;
-    //   });
-    //
-    //   // auth.googleSignIn.signInSilently();
-    // });
     super.initState();
   }
 
@@ -182,9 +164,11 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(
                       width: screenWidth/50,
                       height: screenWidth/50,
-                      child: CircleAvatar(
-                        radius: screenWidth/50,
-                        child: Image.network(currentUser!.photoURL!),
+                      child: ClipOval(
+                        child: CircleAvatar(
+                          radius: screenWidth/50,
+                          child: Image.network(currentUser!.photoURL!),
+                        ),
                       )
                     ),
                   ],

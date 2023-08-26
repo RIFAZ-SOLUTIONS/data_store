@@ -170,7 +170,22 @@ class _InputDetailsState extends State<InputDetails> {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController dropdownMenuController = TextEditingController();
 
-  final List<String> categories = ['Finance', 'Economics', 'Agriculture', 'Medicine', 'Education', 'Other'];
+  final List<String> categories = [
+    'Artificial Intelligence',
+    'Biology',
+    'Business',
+    'Computer Science',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environmental Science',
+    'Finance',
+    'Healthcare',
+    'Manufacturing',
+    'Marketing',
+    'Medicine',
+    'Other'
+  ];
 
   List<DropdownMenuEntry> createCategories(List<String> categories){
     final List<DropdownMenuEntry> categoryList = [];
@@ -285,9 +300,7 @@ class _InputDetailsState extends State<InputDetails> {
                     return null;
                   },
                   onChanged: (value) {
-                    setState(() {
-                      title = titleController.text;
-                    });
+                    title = titleController.text;
                   },
                   decoration: const InputDecoration.collapsed(
                     hintText: 'Enter File Title'
@@ -317,9 +330,7 @@ class _InputDetailsState extends State<InputDetails> {
                     return null;
                   },
                   onChanged: (value) {
-                    setState(() {
-                      description = descriptionController.text;
-                    });
+                    description = descriptionController.text;
                   },
                   decoration: const InputDecoration.collapsed(
                     hintText: 'Enter File Description'
@@ -347,9 +358,7 @@ class _InputDetailsState extends State<InputDetails> {
               width: screenWidth/4,
               initialSelection: 'Finance',
               onSelected: (value) {
-                setState(() {
-                  category = dropdownMenuController.text;
-                });
+                category = dropdownMenuController.text;
               },
               errorText: category.isEmpty? 'Empty' : null,
             ),
