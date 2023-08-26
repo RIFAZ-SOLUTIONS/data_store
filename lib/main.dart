@@ -9,7 +9,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await dotenv.load();
+  await dotenv.load(fileName: 'assets/.env');
   runApp(const MyApp());
 }
 
