@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:data_store/pages/authentication/stub.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
 import 'package:file_picker/file_picker.dart';
@@ -42,9 +41,10 @@ Future<void> showErrorDialog(context,String error) async{
 }
 
 
-Future<void> datasetPreview(context, Map<String,dynamic> previewInput) async{
+Future<void> datasetPreview(context, Map<String,dynamic> previewInput, GoogleSignInAccount? currentUser) async{
   final screenHeight = MediaQuery.of(context).size.height;
   final screenWidth = MediaQuery.of(context).size.width;
+  GlobalKey toolTipKey = GlobalKey();
 
   return showDialog(
       context: context,
@@ -92,20 +92,29 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput) async{
             ],
           ),
           actions: [
-            IconButton.outlined(
-              onPressed: () {
-                downloadFile(previewInput['downloadLink']);
-              },
-              style: ButtonStyle(
-                side: MaterialStateProperty.all( const BorderSide(color: Color.fromRGBO(196, 102, 12, 1)))
-              ),
-                icon: const Text(
-                  'Download',
-                  style: TextStyle(
-                    color: Color.fromRGBO(196, 102, 12, 1),
-                  ),
+            Tooltip(
+              key: toolTipKey,
+              message: 'You must Sign in, to download a file.',
+              child: IconButton.outlined(
+                onPressed: () {
+                  if(currentUser != null){
+                    downloadFile(previewInput['downloadLink']);
+                  } else{
+                    final dynamic toolTip = toolTipKey.currentState;
+                    toolTip.ensureTooltipVisible();
+                  }
+                },
+                style: ButtonStyle(
+                  side: MaterialStateProperty.all( const BorderSide(color: Color.fromRGBO(196, 102, 12, 1)))
                 ),
-              color: const Color.fromRGBO(196, 102, 12, 1),
+                  icon: const Text(
+                    'Download',
+                    style: TextStyle(
+                      color: Color.fromRGBO(196, 102, 12, 1),
+                    ),
+                  ),
+                color: const Color.fromRGBO(196, 102, 12, 1),
+              ),
             ),
           ],
         );

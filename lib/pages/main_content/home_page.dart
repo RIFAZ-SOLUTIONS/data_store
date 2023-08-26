@@ -409,12 +409,14 @@ class _HomePageState extends State<HomePage> {
                                               'fileType': suggestions[index]['fileType'],
                                               'fileSize': suggestions[index]['fileSize'],
                                               'dateAdded': suggestions[index]['dateAdded'],
+                                              'downloads': suggestions[index]['downloads'],
                                               'downloadLink': suggestions[index]['downloadLink'],
                                             };
                                           });
                                           await datasetPreview(
                                             context,
                                             previewInput,
+                                            currentUser
                                           );
                                         },
                                         icon: const Icon(Icons.preview_outlined,
@@ -431,9 +433,13 @@ class _HomePageState extends State<HomePage> {
                                       color: Color.fromRGBO(0, 101, 168, 1),
                                     ),
                                     child: IconButton(
-                                        onPressed: () {
+                                        onPressed: () async{
                                           final String url = suggestions[index]['downloadLink'];
-                                          downloadFile(url);
+                                          if(currentUser != null){
+                                            downloadFile(url);
+                                          } else {
+                                            await showErrorDialog(context, 'You must Sign in, to download a file.');
+                                          }
                                         },
                                         icon: const Icon(Icons.download_for_offline_outlined,
                                         color: Color.fromRGBO(196, 102, 12, 1),
@@ -459,7 +465,8 @@ class _HomePageState extends State<HomePage> {
                             });
                             await datasetPreview(
                               context,
-                              previewInput
+                              previewInput,
+                              currentUser
                             );
                           },
                         ),
@@ -475,7 +482,11 @@ class _HomePageState extends State<HomePage> {
               children: [
                 InkWell(
                   onTap: () async{
-                    await datasetInput(context);
+                    if(currentUser != null){
+                      await datasetInput(context);
+                    } else {
+                      await showErrorDialog(context, 'You must Sign in, to upload a file.');
+                    }
                   },
                   child: Container(
                     height: screenHeight / 5,
