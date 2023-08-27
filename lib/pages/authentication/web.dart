@@ -12,8 +12,8 @@ import 'stub.dart';
 Widget buildSignInButton({HandleSignInFn? onPressed}) {
   return (GoogleSignInPlatform.instance as web.GoogleSignInPlugin)
       .renderButton(
-    configuration: web.GSIButtonConfiguration(
-      locale: 'EN'
-    )
+      configuration: web.GSIButtonConfiguration(
+          locale: 'EN'
+      )
   );
 }

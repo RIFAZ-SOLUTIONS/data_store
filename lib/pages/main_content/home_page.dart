@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
+import 'package:data_store/pages/authentication/web.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
@@ -142,13 +143,26 @@ class _HomePageState extends State<HomePage> {
             child:  currentUser == null ?
             TextButton(
                 onPressed: () async{
-                  final UserCredential credentials = await auth.signInWithGoogle();
-                  setState(() {
-                    currentUser = credentials.user;
-                  });
+                  try{
+                    final UserCredential credentials = await auth.signInWithGoogle();
+                    setState(() {
+                      currentUser = credentials.user;
+                    });
+                  } catch(_){
+                    await showErrorDialog(context, _.toString());
+                  }
                 },
                 child: const Text('Sign In')
-            ):
+            )
+            // buildSignInButton(
+            //   onPressed: () async{
+            //     final UserCredential credentials = await auth.signInWithGoogle();
+            //     setState(() {
+            //       currentUser = credentials.user;
+            //     });
+            //   }
+            // )
+            :
             Container(
               width: screenWidth/4.5,
               height: screenHeight/14,
@@ -212,7 +226,6 @@ class _HomePageState extends State<HomePage> {
                             setState(() {
                               currentUser = null;
                             });
-
                           },
                           icon: const Icon(Icons.logout_outlined,
                             color: Color.fromRGBO(196, 102, 12, 1),

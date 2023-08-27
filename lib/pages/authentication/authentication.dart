@@ -33,8 +33,16 @@ class AuthService{
       'login_hint': 'user@example.com'
     });
 
+    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signInSilently();
+    final GoogleSignInAuthentication? googleAuth = await googleSignInAccount?.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
     // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+    // return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+    return await FirebaseAuth.instance.signInWithCredential(credential);
 
     // Or use signInWithRedirect
     // return await FirebaseAuth.instance.signInWithRedirect(googleProvider);
