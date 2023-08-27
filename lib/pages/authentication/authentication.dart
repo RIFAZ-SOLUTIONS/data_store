@@ -33,6 +33,38 @@ class AuthService{
       'login_hint': 'user@example.com'
     });
 
+    // This code works best when not in web platform
+    // final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+    // final GoogleSignInAuthentication? googleAuth = await googleSignInAccount?.authentication;
+    // final AuthCredential credential = GoogleAuthProvider.credential(
+    //   accessToken: googleAuth?.accessToken,
+    //   idToken: googleAuth?.idToken,
+    // );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+    //This code works best when not in web platform
+    // return await FirebaseAuth.instance.signInWithCredential(credential);
+
+    // Or use signInWithRedirect
+    // return await FirebaseAuth.instance.signInWithRedirect(googleProvider);
+  }
+
+  Future<UserCredential> changeAccountWithGoogle() async {
+    // Create a new provider
+    GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+    googleProvider.addScope('email');
+    googleProvider.setCustomParameters({
+      'login_hint': 'user@example.com'
+    });
+
+    // Once signed in, return the UserCredential
+    // return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+    //This code works best when not in web platform
+    // This code works best when not in web platform
     final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
     final GoogleSignInAuthentication? googleAuth = await googleSignInAccount?.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
@@ -40,12 +72,7 @@ class AuthService{
       idToken: googleAuth?.idToken,
     );
 
-    // Once signed in, return the UserCredential
-    // return await FirebaseAuth.instance.signInWithPopup(googleProvider);
     return await FirebaseAuth.instance.signInWithCredential(credential);
-
-    // Or use signInWithRedirect
-    // return await FirebaseAuth.instance.signInWithRedirect(googleProvider);
   }
 
   Future<void> signOutWithGoogle() async {

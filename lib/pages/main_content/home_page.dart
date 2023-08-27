@@ -141,38 +141,40 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           Container(
             child:  currentUser == null ?
-                InkWell(
-                  onTap: () async{
-                    try{
-                      final UserCredential credentials = await auth.signInWithGoogle();
-                      setState(() {
-                        currentUser = credentials.user;
-                      });
-                    } catch(_){
-                      await showErrorDialog(context, _.toString());
-                    }
-                  },
-                  child: Ink.image(
-                    image: const AssetImage('assets/images/btn_google_signin.png'),
-                    fit: BoxFit.fill,
-                    height: screenHeight/20,
-                    width: screenWidth/10,
-                  ),
-
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () async{
+                        try{
+                          final UserCredential credentials = await auth.signInWithGoogle();
+                          setState(() {
+                            currentUser = credentials.user;
+                          });
+                        } catch(_){
+                          await showErrorDialog(context, _.toString());
+                        }
+                      },
+                      child: Ink.image(
+                        image: const AssetImage('assets/images/btn_google_signin.png'),
+                        fit: BoxFit.cover,
+                        height: screenHeight/15,
+                        width: screenWidth/8,
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'change account',
+                      child: IconButton(
+                        onPressed: () async{
+                          await auth.changeAccountWithGoogle();
+                        },
+                        icon: Icon(Icons.account_box_outlined,
+                          color: const Color.fromRGBO(196, 102, 12, 0.6),
+                          size: screenWidth/40,
+                        ),
+                      ),
+                    )
+                  ],
                 )
-            // TextButton(
-            //     onPressed: () async{
-            //       try{
-            //         final UserCredential credentials = await auth.signInWithGoogle();
-            //         setState(() {
-            //           currentUser = credentials.user;
-            //         });
-            //       } catch(_){
-            //         await showErrorDialog(context, _.toString());
-            //       }
-            //     },
-            //     child: const Text('Sign In')
-            // )
             // buildSignInButton(
             //   onPressed: () async{
             //     final UserCredential credentials = await auth.signInWithGoogle();
