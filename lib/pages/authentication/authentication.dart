@@ -33,7 +33,7 @@ class AuthService{
       'login_hint': 'user@example.com'
     });
 
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signInSilently();
+    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
     final GoogleSignInAuthentication? googleAuth = await googleSignInAccount?.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,

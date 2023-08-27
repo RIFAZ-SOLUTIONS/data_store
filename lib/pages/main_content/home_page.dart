@@ -141,19 +141,38 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           Container(
             child:  currentUser == null ?
-            TextButton(
-                onPressed: () async{
-                  try{
-                    final UserCredential credentials = await auth.signInWithGoogle();
-                    setState(() {
-                      currentUser = credentials.user;
-                    });
-                  } catch(_){
-                    await showErrorDialog(context, _.toString());
-                  }
-                },
-                child: const Text('Sign In')
-            )
+                InkWell(
+                  onTap: () async{
+                    try{
+                      final UserCredential credentials = await auth.signInWithGoogle();
+                      setState(() {
+                        currentUser = credentials.user;
+                      });
+                    } catch(_){
+                      await showErrorDialog(context, _.toString());
+                    }
+                  },
+                  child: Ink.image(
+                    image: const AssetImage('assets/images/btn_google_signin.png'),
+                    fit: BoxFit.fill,
+                    height: screenHeight/20,
+                    width: screenWidth/10,
+                  ),
+
+                )
+            // TextButton(
+            //     onPressed: () async{
+            //       try{
+            //         final UserCredential credentials = await auth.signInWithGoogle();
+            //         setState(() {
+            //           currentUser = credentials.user;
+            //         });
+            //       } catch(_){
+            //         await showErrorDialog(context, _.toString());
+            //       }
+            //     },
+            //     child: const Text('Sign In')
+            // )
             // buildSignInButton(
             //   onPressed: () async{
             //     final UserCredential credentials = await auth.signInWithGoogle();
