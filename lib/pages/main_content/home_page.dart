@@ -446,6 +446,7 @@ class _HomePageState extends State<HomePage> {
                                         onPressed: () async{
                                           setState(() {
                                             previewInput = {
+                                              'userId': suggestions[index]['userId'],
                                               'datasetId': suggestions[index]['datasetId'],
                                               'title': suggestions[index]['title'],
                                               'description': suggestions[index]['description'],
@@ -483,7 +484,8 @@ class _HomePageState extends State<HomePage> {
                                             await database.updateDownloads(
                                                 suggestions[index]['downloads'],
                                                 suggestions[index]['datasetId'],
-                                                currentUser!.uid);
+                                                suggestions[index]['userId'],
+                                                );
                                           } else {
                                             await showErrorDialog(context, 'You must Sign in, to download a file.');
                                           }
@@ -502,6 +504,7 @@ class _HomePageState extends State<HomePage> {
                           onTap: () async{
                             setState(() {
                               previewInput = {
+                                'userId': suggestions[index]['userId'],
                                 'datasetId': suggestions[index]['datasetId'],
                                 'title': suggestions[index]['title'],
                                 'description': suggestions[index]['description'],

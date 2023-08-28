@@ -102,7 +102,8 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? cur
                     await database.updateDownloads(
                         previewInput['downloads'],
                         previewInput['datasetId'],
-                        currentUser.uid);
+                        previewInput['userId']
+                      );
                   } else{
                     final dynamic toolTip = toolTipKey.currentState;
                     toolTip.ensureTooltipVisible();
@@ -379,6 +380,7 @@ class _InputDetailsState extends State<InputDetails> {
                 final String newFileName = '${fileName.split('.')[0]}${Random().nextInt(1000)}.$fileType';
                 final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(3);
                 final Map<String, dynamic> fileData = {
+                  'userId': userId,
                   'title': title,
                   'fileName': newFileName,
                   'description': description,

@@ -37,10 +37,11 @@ class DatabaseService{
   }
 
   Future<void> updateDownloads(int downloads, String datasetId, String userId) async{
+    final int newValue = downloads + 1;
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets/$userId/$datasetId');
     await ref.update({
-      'downloads': downloads + 1
+      'downloads': newValue,
     });
   }
 }
