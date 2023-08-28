@@ -357,7 +357,9 @@ class _InputDetailsState extends State<InputDetails> {
               width: screenWidth/4,
               initialSelection: 'Finance',
               onSelected: (value) {
-                category = dropdownMenuController.text;
+                setState(() {
+                  category = dropdownMenuController.text;
+                });
               },
               errorText: category.isEmpty? 'Empty' : null,
             ),
@@ -365,11 +367,11 @@ class _InputDetailsState extends State<InputDetails> {
           SizedBox(height: screenHeight/20,),
           InkWell(
             onTap: () async{
+              final String userId = widget.user!.uid;
               if (_formKey.currentState!.validate() && isUploaded && fileSize<fileSizeLimit){
                 final String newFileName = '${fileName.split('.')[0]}${Random().nextInt(1000)}.$fileType';
                 final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(3);
                 final Map<String, dynamic> fileData = {
-                  'userId': widget.user?.uid,
                   'title': title,
                   'fileName': newFileName,
                   'description': description,
@@ -381,10 +383,10 @@ class _InputDetailsState extends State<InputDetails> {
                 };
                 try {
                   // TODO add loading overlay
-                  final String filePath = '${widget.user?.uid}/$newFileName';
+                  final String filePath = '$userId/$newFileName';
                   final String downloadLink = await database.storeFile(filePath, fileBytes);
-                  final String datasetID = await database.addFile(fileData);
-                  await database.addDownloadLink(downloadLink, datasetID);
+                  final String datasetId = await database.addFile(fileData, widget.user!.uid);
+                  await database.addDownloadLink(downloadLink, userId, datasetId);
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
@@ -397,6 +399,8 @@ class _InputDetailsState extends State<InputDetails> {
                 } catch(_){
                   await showErrorDialog(context, _.toString());
                 }
+              } else if(!isUploaded){
+                await showErrorDialog(context, 'Upload a file!');
               }
             },
             child: Container(
@@ -418,5 +422,40 @@ class _InputDetailsState extends State<InputDetails> {
         ],
       ),
     );
+  }
+}
+
+class LoadingOverlay {
+  BuildContext _context;
+
+  void hide() {
+    Navigator.of(_context).pop();
+  }
+
+  void show() {
+    showDialog(
+        context: _context,
+        barrierDismissible: false,
+        builder: (ctx) => _FullScreenLoader());
+  }
+
+  Future<T> during<T>(Future<T> future) {
+    show();
+    return future.whenComplete(() => hide());
+  }
+
+  LoadingOverlay._create(this._context);
+
+  factory LoadingOverlay.of(BuildContext context) {
+    return LoadingOverlay._create(context);
+  }
+}
+
+class _FullScreenLoader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.5)),
+        child: const Center(child: CircularProgressIndicator()));
   }
 }

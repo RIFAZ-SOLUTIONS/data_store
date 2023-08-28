@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
-import 'package:data_store/pages/authentication/web.dart';
 import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
@@ -156,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Ink.image(
                         image: const AssetImage('assets/images/btn_google_signin.png'),
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fitWidth,
                         height: screenHeight/15,
                         width: screenWidth/8,
                       ),
@@ -165,7 +164,11 @@ class _HomePageState extends State<HomePage> {
                       message: 'change account',
                       child: IconButton(
                         onPressed: () async{
-                          await auth.changeAccountWithGoogle();
+                          try{
+                            await auth.changeAccountWithGoogle();
+                          } catch(_){
+                            await showErrorDialog(context, _.toString());
+                          }
                         },
                         icon: Icon(Icons.account_box_outlined,
                           color: const Color.fromRGBO(196, 102, 12, 0.6),
@@ -175,14 +178,6 @@ class _HomePageState extends State<HomePage> {
                     )
                   ],
                 )
-            // buildSignInButton(
-            //   onPressed: () async{
-            //     final UserCredential credentials = await auth.signInWithGoogle();
-            //     setState(() {
-            //       currentUser = credentials.user;
-            //     });
-            //   }
-            // )
             :
             Container(
               width: screenWidth/4.5,
@@ -242,11 +237,15 @@ class _HomePageState extends State<HomePage> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           onPressed: () async{
-                            await auth.handleSignOut();
-                            await auth.signOutWithGoogle();
-                            setState(() {
-                              currentUser = null;
-                            });
+                            try{
+                              await auth.handleSignOut();
+                              await auth.signOutWithGoogle();
+                              setState(() {
+                                currentUser = null;
+                              });
+                            } catch(_){
+                              await showErrorDialog(context, _.toString());
+                            }
                           },
                           icon: const Icon(Icons.logout_outlined,
                             color: Color.fromRGBO(196, 102, 12, 1),
@@ -333,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                         onTap: () async{
-                          final DatabaseEvent currentEvent = await database.fetchData();
+                          final DatabaseEvent currentEvent = await database.fetchData(currentUser!.uid);
                           setState(() {
                             event = currentEvent;
                           });
