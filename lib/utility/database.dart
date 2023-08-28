@@ -8,6 +8,7 @@ class DatabaseService{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets');
     final DatabaseEvent event = await ref
+        .orderByChild('title')
         .once();
     return event;
   }
@@ -43,5 +44,19 @@ class DatabaseService{
     await ref.update({
       'downloads': newValue,
     });
+  }
+
+  Future<double> calculateUsedStorage(String userId) async{
+    double totalSizeInBytes = 0;
+    final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
+    final DatabaseReference ref = rtDatabase.ref('datasets/$userId');
+    final DatabaseEvent event = await ref.once();
+    final Map<dynamic,dynamic> events = event.snapshot.value as Map<dynamic,dynamic>;
+    events.forEach((key, value) {
+      final double fileSizeInMB = double.parse(value['fileSize'].toString().split('M')[0]);
+      totalSizeInBytes += (fileSizeInMB*1024*1024);
+    });
+    print(totalSizeInBytes);
+    return totalSizeInBytes;
   }
 }

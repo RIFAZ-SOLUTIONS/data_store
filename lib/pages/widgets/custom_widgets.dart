@@ -163,6 +163,7 @@ class _InputDetailsState extends State<InputDetails> {
   final _formKey = GlobalKey<FormState>();
   final DatabaseService database = DatabaseService();
   int fileSizeLimit = 3*1024*1024;
+  double storageSizeLimit = 100*1024*1024;
   late int fileSize;
   late String? fileType;
   late Uint8List fileBytes;
@@ -185,6 +186,7 @@ class _InputDetailsState extends State<InputDetails> {
     'Engineering',
     'Environmental Science',
     'Finance',
+    'Governance',
     'Healthcare',
     'Manufacturing',
     'Marketing',
@@ -376,9 +378,10 @@ class _InputDetailsState extends State<InputDetails> {
           InkWell(
             onTap: () async{
               final String userId = widget.user!.uid;
-              if (_formKey.currentState!.validate() && isUploaded && fileSize<fileSizeLimit){
+              final double usedStorageSize = await database.calculateUsedStorage(userId);
+              if (_formKey.currentState!.validate() && isUploaded && fileSize<fileSizeLimit && usedStorageSize<storageSizeLimit){
                 final String newFileName = '${fileName.split('.')[0]}${Random().nextInt(1000)}.$fileType';
-                final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(3);
+                final String newFileSize = (fileSize/(1024*1024)).toStringAsFixed(4);
                 final Map<String, dynamic> fileData = {
                   'userId': userId,
                   'title': title,
@@ -405,12 +408,14 @@ class _InputDetailsState extends State<InputDetails> {
                     );
                   }
                 } catch(_){
-                  await showErrorDialog(context, _.toString());
+                  if(context.mounted) await showErrorDialog(context, _.toString());
                 }
               } else if(!isUploaded){
-                await showErrorDialog(context, 'Upload a file!');
+                if(context.mounted) await showErrorDialog(context, 'Upload a file!');
               } else if(fileSize>fileSizeLimit){
-                await showErrorDialog(context, 'File size exceeds upload limit, choose a smaller file!');
+                if(context.mounted) await showErrorDialog(context, 'File size exceeds upload limit, choose a smaller file!');
+              } else if(usedStorageSize>=storageSizeLimit){
+                if(context.mounted) await showErrorDialog(context, 'You have reached your storage limit, delete some files!');
               }
             },
             child: Container(
