@@ -4,11 +4,10 @@ import 'package:flutter/foundation.dart';
 
 class DatabaseService{
 
-  Future<DatabaseEvent> fetchData(String userId) async{
+  Future<DatabaseEvent> fetchData() async{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
-    final DatabaseReference ref = rtDatabase.ref('datasets/$userId');
+    final DatabaseReference ref = rtDatabase.ref('datasets');
     final DatabaseEvent event = await ref
-        .orderByChild('title')
         .once();
     return event;
   }
@@ -28,11 +27,20 @@ class DatabaseService{
     return downloadLink;
   }
 
-  Future<void> addDownloadLink(String downloadLink, String userId, String datasetId) async{
+  Future<void> addNewFields(String downloadLink, String userId, String datasetId) async{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets/$userId/$datasetId');
     await ref.update({
-      'downloadLink': downloadLink
+      'downloadLink': downloadLink,
+      'datasetId': datasetId,
+    });
+  }
+
+  Future<void> updateDownloads(int downloads, String datasetId, String userId) async{
+    final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
+    final DatabaseReference ref = rtDatabase.ref('datasets/$userId/$datasetId');
+    await ref.update({
+      'downloads': downloads + 1
     });
   }
 }

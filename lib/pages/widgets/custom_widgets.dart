@@ -43,6 +43,7 @@ Future<void> showErrorDialog(context,String error) async{
 Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? currentUser) async{
   final screenHeight = MediaQuery.of(context).size.height;
   final screenWidth = MediaQuery.of(context).size.width;
+  final DatabaseService database = DatabaseService();
   GlobalKey toolTipKey = GlobalKey();
 
   return showDialog(
@@ -95,9 +96,13 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? cur
               key: toolTipKey,
               message: 'You must Sign in, to download a file.',
               child: IconButton.outlined(
-                onPressed: () {
+                onPressed: () async{
                   if(currentUser != null){
                     downloadFile(previewInput['downloadLink']);
+                    await database.updateDownloads(
+                        previewInput['downloads'],
+                        previewInput['datasetId'],
+                        currentUser.uid);
                   } else{
                     final dynamic toolTip = toolTipKey.currentState;
                     toolTip.ensureTooltipVisible();
@@ -343,10 +348,12 @@ class _InputDetailsState extends State<InputDetails> {
           SizedBox(height: screenHeight/20,),
           Flexible(
             child: DropdownMenu(
+              menuHeight: screenHeight/4,
               controller: dropdownMenuController,
               dropdownMenuEntries: createCategories(categories),
               label: const Text('Select Category'),
               menuStyle: MenuStyle(
+                mouseCursor: const MaterialStatePropertyAll(MaterialStateMouseCursor.clickable),
                   elevation: MaterialStateProperty.all(2),
                   side: MaterialStateProperty.all(const BorderSide(
                       color: Color.fromRGBO(196, 102, 12, 1),
@@ -385,7 +392,7 @@ class _InputDetailsState extends State<InputDetails> {
                   final String filePath = '$userId/$newFileName';
                   final String downloadLink = await LoadingOverlay.of(context).during(database.storeFile(filePath, fileBytes));
                   final String datasetId = await LoadingOverlay.of(context).during(database.addFile(fileData, userId));
-                  if(context.mounted) await LoadingOverlay.of(context).during(database.addDownloadLink(downloadLink, userId, datasetId));
+                  if(context.mounted) await LoadingOverlay.of(context).during(database.addNewFields(downloadLink, userId, datasetId));
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
@@ -400,6 +407,8 @@ class _InputDetailsState extends State<InputDetails> {
                 }
               } else if(!isUploaded){
                 await showErrorDialog(context, 'Upload a file!');
+              } else if(fileSize>fileSizeLimit){
+                await showErrorDialog(context, 'File size exceeds upload limit, choose a smaller file!');
               }
             },
             child: Container(

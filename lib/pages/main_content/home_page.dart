@@ -56,13 +56,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     // final RegExp regExp = RegExp(query, caseSensitive: false);
-
-    values.forEach((key, value) {
-      final List<dynamic> matches = Fuzzy(value['title'].toString().trim().split(' '), options: FuzzyOptions(threshold: 0.72)).search(query);
-      // regExp.hasMatch(value['title'])
-      if (matches.isNotEmpty){
-        updatedSuggestions.add(value);
-      }
+    values.forEach((userId, dataset) {
+      dataset.forEach((datasetId,value){
+        final List<dynamic> matches = Fuzzy(value['title'].toString().trim().split(' '), options: FuzzyOptions(threshold: 0.72)).search(query);
+        // regExp.hasMatch(value['title'])
+        if (matches.isNotEmpty){
+          updatedSuggestions.add(value);
+        }
+      });
     });
 
     setState(() {
@@ -332,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                         onTap: () async{
-                          final DatabaseEvent currentEvent = await database.fetchData(currentUser!.uid);
+                          final DatabaseEvent currentEvent = await database.fetchData();
                           setState(() {
                             event = currentEvent;
                           });
@@ -445,6 +446,7 @@ class _HomePageState extends State<HomePage> {
                                         onPressed: () async{
                                           setState(() {
                                             previewInput = {
+                                              'datasetId': suggestions[index]['datasetId'],
                                               'title': suggestions[index]['title'],
                                               'description': suggestions[index]['description'],
                                               'fileType': suggestions[index]['fileType'],
@@ -478,6 +480,10 @@ class _HomePageState extends State<HomePage> {
                                           final String url = suggestions[index]['downloadLink'];
                                           if(currentUser != null){
                                             downloadFile(url);
+                                            await database.updateDownloads(
+                                                suggestions[index]['downloads'],
+                                                suggestions[index]['datasetId'],
+                                                currentUser!.uid);
                                           } else {
                                             await showErrorDialog(context, 'You must Sign in, to download a file.');
                                           }
@@ -496,11 +502,13 @@ class _HomePageState extends State<HomePage> {
                           onTap: () async{
                             setState(() {
                               previewInput = {
+                                'datasetId': suggestions[index]['datasetId'],
                                 'title': suggestions[index]['title'],
                                 'description': suggestions[index]['description'],
                                 'fileType': suggestions[index]['fileType'],
                                 'fileSize': suggestions[index]['fileSize'],
                                 'dateAdded': suggestions[index]['dateAdded'],
+                                'downloads': suggestions[index]['downloads'],
                                 'downloadLink': suggestions[index]['downloadLink'],
                               };
                             });
