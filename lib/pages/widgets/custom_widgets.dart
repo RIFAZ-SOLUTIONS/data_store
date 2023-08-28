@@ -382,11 +382,10 @@ class _InputDetailsState extends State<InputDetails> {
                   'fileSize': '${newFileSize}MB',
                 };
                 try {
-                  // TODO add loading overlay
                   final String filePath = '$userId/$newFileName';
-                  final String downloadLink = await database.storeFile(filePath, fileBytes);
-                  final String datasetId = await database.addFile(fileData, widget.user!.uid);
-                  await database.addDownloadLink(downloadLink, userId, datasetId);
+                  final String downloadLink = await LoadingOverlay.of(context).during(database.storeFile(filePath, fileBytes));
+                  final String datasetId = await LoadingOverlay.of(context).during(database.addFile(fileData, userId));
+                  if(context.mounted) await LoadingOverlay.of(context).during(database.addDownloadLink(downloadLink, userId, datasetId));
                   if(context.mounted) Navigator.of(context).pop();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(
