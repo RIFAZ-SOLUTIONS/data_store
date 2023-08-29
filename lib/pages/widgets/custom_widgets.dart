@@ -102,7 +102,6 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? cur
                     await database.updateDownloads(
                         previewInput['downloads'],
                         previewInput['datasetId'],
-                        previewInput['userId']
                       );
                   } else{
                     final dynamic toolTip = toolTipKey.currentState;
@@ -389,7 +388,7 @@ class _InputDetailsState extends State<InputDetails> {
                   'description': description,
                   'category': category,
                   'dateAdded': DateFormat('dd-MM-yyyy').format(DateTime.now()),
-                  'downloads': 0,
+                  'userDownloads': 0,
                   'fileType': '.${fileType!.toUpperCase()}',
                   'fileSize': '${newFileSize}MB',
                 };

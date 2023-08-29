@@ -7,9 +7,14 @@ class DatabaseService{
   Future<DatabaseEvent> fetchData() async{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets');
-    final DatabaseEvent event = await ref
-        .orderByChild('title')
-        .once();
+    final DatabaseEvent event = await ref.once();
+    return event;
+  }
+
+  Future<DatabaseEvent> fetchDownloads() async{
+    final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
+    final DatabaseReference downRef = rtDatabase.ref('downloads');
+    final DatabaseEvent event = await downRef.once();
     return event;
   }
 
@@ -18,7 +23,9 @@ class DatabaseService{
     final DatabaseReference ref = rtDatabase.ref('datasets');
     final String? key = ref.push().key;
     final DatabaseReference newRef = rtDatabase.ref('datasets/$userId/$key');
+    final DatabaseReference downRef = rtDatabase.ref('downloads/$key');
     await newRef.update(fileData);
+    await downRef.update({'downloads':0,'datasetId':key});
     return key!;
   }
 
@@ -37,11 +44,20 @@ class DatabaseService{
     });
   }
 
-  Future<void> updateDownloads(int downloads, String datasetId, String userId) async{
+  // Future<void> updateDownloads(int downloads, String datasetId, String userId) async{
+  //   final int newValue = downloads + 1;
+  //   final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
+  //   final DatabaseReference ref = rtDatabase.ref('datasets/$userId/$datasetId');
+  //   await ref.update({
+  //     'downloads': newValue,
+  //   });
+  // }
+
+  Future<void> updateDownloads(int downloads, String datasetId) async{
     final int newValue = downloads + 1;
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
-    final DatabaseReference ref = rtDatabase.ref('datasets/$userId/$datasetId');
-    await ref.update({
+    final DatabaseReference downRef = rtDatabase.ref('downloads/$datasetId');
+    await downRef.update({
       'downloads': newValue,
     });
   }
@@ -51,12 +67,20 @@ class DatabaseService{
     final FirebaseDatabase rtDatabase = FirebaseDatabase.instance;
     final DatabaseReference ref = rtDatabase.ref('datasets/$userId');
     final DatabaseEvent event = await ref.once();
-    final Map<dynamic,dynamic> events = event.snapshot.value as Map<dynamic,dynamic>;
+    late Map<dynamic,dynamic> events;
+
+    try{
+      events = event.snapshot.value as Map<dynamic,dynamic>;
+    } catch(_){
+      events = {
+        "datasetId":{"fileSize":"0MB"}
+      };
+    }
+
     events.forEach((key, value) {
       final double fileSizeInMB = double.parse(value['fileSize'].toString().split('M')[0]);
       totalSizeInBytes += (fileSizeInMB*1024*1024);
     });
-    print(totalSizeInBytes);
     return totalSizeInBytes;
   }
 }

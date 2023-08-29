@@ -32,35 +32,54 @@ class _HomePageState extends State<HomePage> {
   final DatabaseService database = DatabaseService();
   final AuthService auth = AuthService();
   List<dynamic> suggestions = [];
-  late DatabaseEvent event;
+  List<dynamic> suggestedDownloads = [];
+  late DatabaseEvent dataEvent;
+  late DatabaseEvent downloadsEvent;
 
   Future<void> fetchSuggestions(query) async {
     if (query.isEmpty) {
       setState(() {
         suggestions = [];
+        suggestedDownloads = [];
       });
     }
 
     final updatedSuggestions = [];
-    late Map<dynamic, dynamic> values;
+    final updatedSuggestedDownloads = [];
+    late Map<dynamic, dynamic> dataValues;
+    late Map<dynamic, dynamic> downloadsValues;
     try {
-      values = event.snapshot.value as Map<dynamic, dynamic>;
+      dataValues = dataEvent.snapshot.value as Map<dynamic, dynamic>;
+      downloadsValues = downloadsEvent.snapshot.value as Map<dynamic, dynamic>;
     } catch(e){
-      values = {'dataset0':
+      dataValues = {'fsdlajaidjfas4':
         {
-        'title': 'No results',
-        'downloads': 0,
-        'added': ''
+        'fhaskadkasl': {
+          'title': 'No results',
+          'downloads': 0,
+          'added': ''
+          }
+        }
+      };
+      downloadsValues = {"123yghui9nslfsi9":
+        {
+          "datasetId": "123yghui9nslfsi9",
+          "downloads": 0
         }
       };
     }
 
     // final RegExp regExp = RegExp(query, caseSensitive: false);
-    values.forEach((userId, dataset) {
+    dataValues.forEach((userId, dataset) {
       dataset.forEach((datasetId,value){
         final List<dynamic> matches = Fuzzy(value['title'].toString().trim().split(' '), options: FuzzyOptions(threshold: 0.72)).search(query);
         // regExp.hasMatch(value['title'])
         if (matches.isNotEmpty){
+          downloadsValues.forEach((key, downloads) {
+            if(downloads['datasetId'] == value['datasetId']){
+              value['downloads'] = downloads['downloads'];
+            }
+          });
           updatedSuggestions.add(value);
         }
       });
@@ -333,9 +352,25 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                         onTap: () async{
-                          final DatabaseEvent currentEvent = await database.fetchData();
+                          List<Map<String, dynamic>> myList = [
+                            {'name' : 'ifredom','age':23, 'id':123},
+                            {'name' : 'JackMa','age':61, 'id':456},
+                            {'name' : 'zhazhahui','age':48, 'id':678},
+                          ];
+                          List<Map<String, dynamic>> myList1 = [
+                            {'name' : 'ifredom','age':23, 'id':12},
+                            {'name' : 'JackMa','age':6, 'id':45},
+                            {'name' : 'zhazhahui','age':48, 'id':678},
+                          ];
+                          myList.sort((a, b) => (b['name']).compareTo(a['name']));
+                          myList1.sort((a, b) => (b['name']).compareTo(a['name']));
+                          print(myList);
+                          print(myList1);
+                          final DatabaseEvent currentDataEvent = await database.fetchData();
+                          final DatabaseEvent currentDownloadsEvent = await database.fetchDownloads();
                           setState(() {
-                            event = currentEvent;
+                            dataEvent = currentDataEvent;
+                            downloadsEvent = currentDownloadsEvent;
                           });
                         },
                         onChanged: (query) async{
@@ -484,7 +519,6 @@ class _HomePageState extends State<HomePage> {
                                             await database.updateDownloads(
                                                 suggestions[index]['downloads'],
                                                 suggestions[index]['datasetId'],
-                                                suggestions[index]['userId'],
                                                 );
                                           } else {
                                             await showErrorDialog(context, 'You must Sign in, to download a file.');
