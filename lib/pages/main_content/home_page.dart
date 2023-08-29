@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
   final DatabaseService database = DatabaseService();
   final AuthService auth = AuthService();
   List<dynamic> suggestions = [];
-  List<dynamic> suggestedDownloads = [];
   late DatabaseEvent dataEvent;
   late DatabaseEvent downloadsEvent;
 
@@ -40,12 +39,10 @@ class _HomePageState extends State<HomePage> {
     if (query.isEmpty) {
       setState(() {
         suggestions = [];
-        suggestedDownloads = [];
       });
     }
 
     final updatedSuggestions = [];
-    final updatedSuggestedDownloads = [];
     late Map<dynamic, dynamic> dataValues;
     late Map<dynamic, dynamic> downloadsValues;
     try {
@@ -352,20 +349,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                         onTap: () async{
-                          List<Map<String, dynamic>> myList = [
-                            {'name' : 'ifredom','age':23, 'id':123},
-                            {'name' : 'JackMa','age':61, 'id':456},
-                            {'name' : 'zhazhahui','age':48, 'id':678},
-                          ];
-                          List<Map<String, dynamic>> myList1 = [
-                            {'name' : 'ifredom','age':23, 'id':12},
-                            {'name' : 'JackMa','age':6, 'id':45},
-                            {'name' : 'zhazhahui','age':48, 'id':678},
-                          ];
-                          myList.sort((a, b) => (b['name']).compareTo(a['name']));
-                          myList1.sort((a, b) => (b['name']).compareTo(a['name']));
-                          print(myList);
-                          print(myList1);
                           final DatabaseEvent currentDataEvent = await database.fetchData();
                           final DatabaseEvent currentDownloadsEvent = await database.fetchDownloads();
                           setState(() {
