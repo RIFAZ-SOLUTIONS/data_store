@@ -431,9 +431,13 @@ class _HomePageState extends State<HomePage> {
                                 ),),
                               subtitle: Row(
                                 children: [
-                                  Text('Date added: ${suggestions[index]["dateAdded"]}'),
+                                  Flexible(
+                                    fit: FlexFit.tight,
+                                    child: Text('Date added: ${suggestions[index]["dateAdded"]}')),
                                   SizedBox(width: screenWidth/120,),
-                                  Text('Category: ${suggestions[index]["category"]}'),
+                                  Flexible(
+                                    fit: FlexFit.tight,
+                                    child: Text('Category: ${suggestions[index]["category"]}')),
                                   SizedBox(width: screenWidth/120,),
                                   Container(
                                     height: screenHeight/38,
