@@ -173,9 +173,11 @@ class _InputDetailsState extends State<InputDetails> {
   late String fileName;
   late bool isUploaded;
   late String title;
+  late String source;
   late String description;
   late String category;
   final TextEditingController titleController = TextEditingController();
+  final TextEditingController sourceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController dropdownMenuController = TextEditingController();
 
@@ -210,6 +212,7 @@ class _InputDetailsState extends State<InputDetails> {
   void initState() {
     super.initState();
     title = '';
+    source = '';
     description = '';
     category = '';
     fileName = '';
@@ -350,6 +353,36 @@ class _InputDetailsState extends State<InputDetails> {
                       ),
                       expands: true,
                       maxLines: null,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: screenHeight/20,),
+              Container(
+                height: screenHeight/12,
+                width: screenWidth/4,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color.fromRGBO(196, 102, 12, 1)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Center(
+                    child: TextFormField(
+                      keyboardType: TextInputType.text,
+                      controller: sourceController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty){
+                          return 'Empty';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        source = sourceController.text;
+                      },
+                      decoration: const InputDecoration.collapsed(
+                          hintText: 'Enter File source'
+                      ),
                     ),
                   ),
                 ),
