@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
-import 'package:data_store/pages/widgets/custom_widgets.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
+import 'package:data_store/widgets/custom_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -432,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                               subtitle: Row(
                                 children: [
                                   Flexible(
-                                    fit: FlexFit.tight,
+                                    fit: FlexFit.loose,
                                     child: Text('Date added: ${suggestions[index]["dateAdded"]}')),
                                   SizedBox(width: screenWidth/120,),
                                   Flexible(
@@ -471,6 +471,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Flexible(
+                                      fit: FlexFit.tight,
                                       child: Tooltip(
                                         message: 'preview',
                                         preferBelow: false,
@@ -504,6 +505,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(width: 10,),
                                     Flexible(
                                       child: Tooltip(
                                         message: 'download',
