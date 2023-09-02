@@ -246,7 +246,7 @@ class _InputDetailsState extends State<InputDetails> {
                     onTap: () async{
                       FilePickerResult? result = await FilePicker.platform.pickFiles(
                         type: FileType.custom,
-                        allowedExtensions: ['csv','pdf','xlsx','odt'],
+                        allowedExtensions: ['csv','pdf','xls', 'xlsx','odt'],
                       );
                       if (result != null) {
                         setState(() {
