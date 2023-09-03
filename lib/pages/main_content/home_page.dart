@@ -489,6 +489,7 @@ class _HomePageState extends State<HomePage> {
                                                   'fileType': suggestions[index]['fileType'],
                                                   'fileSize': suggestions[index]['fileSize'],
                                                   'dateAdded': suggestions[index]['dateAdded'],
+                                                  'source': suggestions[index]['source'],
                                                   'downloads': suggestions[index]['downloads'],
                                                   'downloadLink': suggestions[index]['downloadLink'],
                                                 };
@@ -547,6 +548,7 @@ class _HomePageState extends State<HomePage> {
                                     'fileType': suggestions[index]['fileType'],
                                     'fileSize': suggestions[index]['fileSize'],
                                     'dateAdded': suggestions[index]['dateAdded'],
+                                    'source': suggestions[index]['source'],
                                     'downloads': suggestions[index]['downloads'],
                                     'downloadLink': suggestions[index]['downloadLink'],
                                   };

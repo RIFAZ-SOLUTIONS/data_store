@@ -91,6 +91,11 @@ Future<void> datasetPreview(context, Map<String,dynamic> previewInput, User? cur
                         fontWeight: FontWeight.w700,
                       )
                   ),
+                  Text('Source: ${previewInput['source']}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                      )
+                  ),
                 ],
               ),
             ),
