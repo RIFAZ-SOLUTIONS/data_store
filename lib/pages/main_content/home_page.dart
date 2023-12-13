@@ -142,157 +142,174 @@ class _HomePageState extends State<HomePage> {
             .toList();
 
         return Scaffold(
-          backgroundColor: Colors.white60,
-          appBar: AppBar(
-            elevation: 3,
-            title: Padding(
-              padding: EdgeInsets.only(left: screenWidth/6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('The DataStore',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 27
-                    ),
-                  ),
-                  SizedBox(width: screenWidth/130,),
-                  const Text('Portal',
-                    style: TextStyle(
-                      color: Color.fromRGBO(196, 102, 12, 1),
-                      fontSize: 27,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              Container(
-                child:  currentUser == null ?
-                Row(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(screenHeight/6),
+            child: AppBar(
+              elevation: 0,
+              toolbarHeight: screenHeight/6,
+              title: Padding(
+                padding: EdgeInsets.only(left: screenWidth/20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () async{
-                        try{
-                          final UserCredential credentials = await auth.signInWithGoogle();
-                          setState(() {
-                            currentUser = credentials.user;
-                          });
-                        } catch(_){
-                          await showErrorDialog(context, _.toString());
-                        }
-                      },
-                      child: Ink.image(
-                        image: const AssetImage('assets/images/btn_google_signin.png'),
-                        fit: BoxFit.fitWidth,
-                        height: screenHeight/15,
-                        width: screenWidth/8,
+                    const Text('The DataStore',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                        fontFamily: 'Nunito Sans',
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Tooltip(
-                      message: 'change account',
-                      child: IconButton(
-                        onPressed: () async{
+                    SizedBox(width: screenWidth/130,),
+                    const Text('Portal',
+                      style: TextStyle(
+                        color: Color(0xFFC4660C),
+                        fontSize: 32,
+                        fontFamily: 'Nunito Sans',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                Container(
+                  child:  currentUser == null ?
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () async{
                           try{
-                            await auth.changeAccountWithGoogle();
+                            final UserCredential credentials = await auth.signInWithGoogle();
+                            setState(() {
+                              currentUser = credentials.user;
+                            });
                           } catch(_){
                             await showErrorDialog(context, _.toString());
                           }
                         },
-                        icon: Icon(Icons.account_box_outlined,
-                          color: const Color.fromRGBO(196, 102, 12, 0.6),
-                          size: screenWidth/40,
+                        // child: Ink.image(
+                        //   image: const AssetImage('assets/images/btn_google_signin.png'),
+                        //   fit: BoxFit.fitWidth,
+                        //   height: screenHeight/15,
+                        //   width: screenWidth/8,
+                        // ),
+                        child: Container(
+                          width: 188,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE2E7EB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
-                    )
-                  ],
-                )
-                    :
-                Container(
-                  width: screenWidth/4.5,
-                  height: screenHeight/14,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(0, 101, 168, 1),
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: ListTile(
-                    leading: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
+
+                      Tooltip(
+                        message: 'change account',
+                        child: IconButton(
+                          onPressed: () async{
+                            try{
+                              await auth.changeAccountWithGoogle();
+                            } catch(_){
+                              await showErrorDialog(context, _.toString());
+                            }
+                          },
+                          icon: Icon(Icons.account_box_outlined,
+                            color: const Color.fromRGBO(196, 102, 12, 0.6),
+                            size: screenWidth/40,
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                      :
+                  Container(
+                    width: screenWidth/4.5,
+                    height: screenHeight/14,
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(0, 101, 168, 1),
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: ListTile(
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                              width: screenWidth/50,
+                              height: screenWidth/50,
+                              child: ClipOval(
+                                child: CircleAvatar(
+                                  radius: screenWidth/50,
+                                  child: Image.network(currentUser!.photoURL!),
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                      tileColor: const Color.fromRGBO(0, 101, 168, 1),
+                      dense: true,
+                      visualDensity: const VisualDensity(
+                        vertical: -4.0,
+                        horizontal: 1.0,
+                      ),
+                      title: Text(currentUser?.displayName ?? 'user',
+                        style: TextStyle(
+                            color: const Color.fromRGBO(196, 102, 12, 1),
+                            fontSize: screenWidth/100,
+                            fontWeight: FontWeight.w600
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(currentUser!.email!,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: screenWidth/100,
+                            fontWeight: FontWeight.w400
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
                             width: screenWidth/50,
                             height: screenWidth/50,
-                            child: ClipOval(
-                              child: CircleAvatar(
-                                radius: screenWidth/50,
-                                child: Image.network(currentUser!.photoURL!),
-                              ),
-                            )
-                        ),
-                      ],
-                    ),
-                    tileColor: const Color.fromRGBO(0, 101, 168, 1),
-                    dense: true,
-                    visualDensity: const VisualDensity(
-                      vertical: -4.0,
-                      horizontal: 1.0,
-                    ),
-                    title: Text(currentUser?.displayName ?? 'user',
-                      style: TextStyle(
-                          color: const Color.fromRGBO(196, 102, 12, 1),
-                          fontSize: screenWidth/100,
-                          fontWeight: FontWeight.w600
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(currentUser!.email!,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: screenWidth/100,
-                          fontWeight: FontWeight.w400
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: screenWidth/50,
-                          height: screenWidth/50,
-                          child: Tooltip(
-                            message: 'Sign out',
-                            child: IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () async{
-                                try{
-                                  await auth.handleSignOut();
-                                  await auth.signOutWithGoogle();
-                                  setState(() {
-                                    currentUser = null;
-                                  });
-                                } catch(_){
-                                  await showErrorDialog(context, _.toString());
-                                }
-                              },
-                              icon: const Icon(Icons.logout_outlined,
-                                color: Color.fromRGBO(196, 102, 12, 1),
+                            child: Tooltip(
+                              message: 'Sign out',
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () async{
+                                  try{
+                                    await auth.handleSignOut();
+                                    await auth.signOutWithGoogle();
+                                    setState(() {
+                                      currentUser = null;
+                                    });
+                                  } catch(_){
+                                    await showErrorDialog(context, _.toString());
+                                  }
+                                },
+                                icon: const Icon(Icons.logout_outlined,
+                                  color: Color.fromRGBO(196, 102, 12, 1),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-            automaticallyImplyLeading: false,
-            bottomOpacity: 3.5,
-            shadowColor: const Color.fromRGBO(50, 94, 135, 1),
-            backgroundColor: const Color.fromRGBO(0, 101, 168, 1),
+              ],
+              automaticallyImplyLeading: false,
+              bottomOpacity: 3.5,
+              backgroundColor: Colors.transparent,
+            ),
           ),
           body: RawScrollbar(
             controller: scrollController,
