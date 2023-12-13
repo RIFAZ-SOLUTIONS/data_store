@@ -1,4 +1,4 @@
-# Datastore Portal: Open-Source Web App for East African Data Sharing
+# Datastore Portal: Dataset Sharing
 
 **Datastore Portal** is an open-source web application built using Flutter and Firebase Realtime Database, designed to facilitate the upload, download, and sharing of datasets primarily produced in Tanzania and East Africa.
 
