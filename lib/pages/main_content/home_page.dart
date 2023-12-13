@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:data_store/pages/authentication/authentication.dart';
 import 'package:data_store/utility/database.dart';
 import 'package:data_store/utility/functions.dart';
@@ -191,18 +192,31 @@ class _HomePageState extends State<HomePage> {
                             await showErrorDialog(context, _.toString());
                           }
                         },
-                        // child: Ink.image(
-                        //   image: const AssetImage('assets/images/btn_google_signin.png'),
-                        //   fit: BoxFit.fitWidth,
-                        //   height: screenHeight/15,
-                        //   width: screenWidth/8,
-                        // ),
                         child: Container(
-                          width: 188,
-                          height: 30,
+                          width: 168,
+                          height: 34,
                           decoration: BoxDecoration(
                             color: const Color(0xFFE2E7EB),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const SizedBox(width: 8,),
+                              SvgPicture.asset("assets/images/google.svg",
+                              height: 25,
+                              ),
+                              const SizedBox(width: 12,),
+                            const Text(
+                              'Sign in with Google',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                                fontFamily: 'Nunito Sans',
+                                fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
