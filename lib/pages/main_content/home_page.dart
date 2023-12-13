@@ -231,9 +231,9 @@ class _HomePageState extends State<HomePage> {
                               await showErrorDialog(context, _.toString());
                             }
                           },
-                          icon: Icon(Icons.account_box_outlined,
-                            color: const Color.fromRGBO(196, 102, 12, 0.6),
-                            size: screenWidth/40,
+                          icon: const Icon(Icons.account_box_outlined,
+                            color: Color.fromRGBO(196, 102, 12, 0.6),
+                            size: 40,
                           ),
                         ),
                       )
@@ -325,7 +325,36 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.transparent,
             ),
           ),
-          body: RawScrollbar(
+          body: Stack(
+            children: [
+              Positioned(
+                top: 50,
+                left: 50,
+                child: Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(10, 20, 27, 52),
+                    borderRadius: BorderRadius.circular(9999),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        spreadRadius: 200,
+                        blurRadius: 200,
+                        offset: const Offset(5, 5), // Adjust offset for blur direction
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius:200,
+                        blurRadius: 200,
+                        offset: const Offset(-5, -5), // Adjust offset for blur direction
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              RawScrollbar(
             controller: scrollController,
             thumbColor: const Color.fromRGBO(196, 102, 12, 0.6),
             thickness: 8,
@@ -463,12 +492,12 @@ class _HomePageState extends State<HomePage> {
                               subtitle: Row(
                                 children: [
                                   Flexible(
-                                    fit: FlexFit.loose,
-                                    child: Text('Date added: ${suggestions[index]["dateAdded"]}')),
+                                      fit: FlexFit.loose,
+                                      child: Text('Date added: ${suggestions[index]["dateAdded"]}')),
                                   SizedBox(width: screenWidth/120,),
                                   Flexible(
-                                    fit: FlexFit.tight,
-                                    child: Text('Category: ${suggestions[index]["category"]}')),
+                                      fit: FlexFit.tight,
+                                      child: Text('Category: ${suggestions[index]["category"]}')),
                                   SizedBox(width: screenWidth/120,),
                                   Container(
                                     height: screenHeight/38,
@@ -663,9 +692,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+            ]
+          ),
         );
 
       },
     );
   }
 }
+
